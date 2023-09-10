@@ -83,7 +83,7 @@ fn main() -> IOResult<()> {
 fn display(game: &Game, buffer: &mut String) -> IOResult<()> {
     buffer.clear();
     buffer.push_str(&format!(
-        "WASD or arrows to move.\nZ to undo.\nQ to quit\n\nSCORE: {}\n\n",
+        "WASD or arrows to move\nZ to undo\nQ to quit\n\nSCORE: {}\n\n",
         game.score()
     ));
     let max_width = game
