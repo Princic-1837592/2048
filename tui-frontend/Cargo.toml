@@ -7,3 +7,4 @@ edition = "2021"
 
 [dependencies]
 backend = { path = "../backend" }
+crossterm = "0.27.0"
