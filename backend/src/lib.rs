@@ -167,7 +167,6 @@ impl Game {
                 self.rng.next_u32() as usize % self.board[0].len(),
             );
         }
-        // 10% probability of spawning 4
         let value = if self.rng.next_u32() % 10 == 0 { 4 } else { 2 };
         self.board[i][j] = value;
         self.score += value;
