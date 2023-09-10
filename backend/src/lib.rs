@@ -5,13 +5,20 @@ use rand::{rngs::StdRng, RngCore, SeedableRng};
 #[cfg(test)]
 mod tests;
 
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Clone, Debug)]
 pub struct Game {
     score: usize,
     board: Vec<Vec<usize>>,
     transpose: Vec<Vec<usize>>,
-    history: VecDeque<Self>,
+    history: VecDeque<History>,
+    max_history: usize,
     rng: StdRng,
+}
+
+#[derive(Clone, Debug)]
+struct History {
+    score: usize,
+    board: Vec<Vec<usize>>,
 }
 
 pub enum Direction {
@@ -21,27 +28,19 @@ pub enum Direction {
     D,
 }
 
-#[derive(Copy, Clone, Debug)]
-struct Coord {
-    i: usize,
-    j: usize,
-}
-
-#[derive(Copy, Clone, Debug)]
-struct Spawn {
-    value: usize,
-    coord: Coord,
-}
-
 impl Game {
-    /// Create a new game.
-    /// `width` and `height` must be at least 3 and at most 10.
-    /// `max_history` can be 0 to disable `undo`
+    /// Create a new game with a random seed
     pub fn new(height: usize, width: usize, max_history: usize) -> Option<Self> {
         Self::from_seed(height, width, max_history, rand::thread_rng().next_u64())
     }
 
-    fn from_seed(height: usize, width: usize, max_history: usize, seed: u64) -> Option<Self> {
+    /// Create a new game.
+    /// `width` and `height` must be at least 3 and at most 10.
+    ///
+    /// `max_history` can be 0 to disable `undo`.
+    /// History vector won't be allocated to `max_history` capacity,
+    /// so it's safe to pass `usize::MAX` for a virtually infinite history
+    pub fn from_seed(height: usize, width: usize, max_history: usize, seed: u64) -> Option<Self> {
         if !(3..=10).contains(&width) || !(3..=10).contains(&height) {
             None
         } else {
@@ -49,7 +48,8 @@ impl Game {
                 score: 0,
                 board: vec![vec![0; width]; height],
                 transpose: vec![vec![0; height]; width],
-                history: VecDeque::with_capacity(max_history),
+                history: VecDeque::new(),
+                max_history,
                 rng: StdRng::seed_from_u64(seed),
             };
             result.spawn();
@@ -59,7 +59,7 @@ impl Game {
     }
 
     pub fn push(&mut self, direction: Direction) -> bool {
-        let before = self.clone();
+        let before = History::new(self);
         match direction {
             Direction::U => {
                 self.reverse();
@@ -89,7 +89,7 @@ impl Game {
             }
         };
         self.spawn();
-        if moved {
+        if moved && self.max_history > 0 {
             self.add_to_history(before);
         }
         moved
@@ -124,15 +124,22 @@ impl Game {
         result
     }
 
-    fn add_to_history(&mut self, state: Self) {
-        if self.history.len() == self.history.capacity() {
+    fn add_to_history(&mut self, state: History) {
+        if self.history.len() >= self.max_history {
             self.history.pop_back();
         }
         self.history.push_front(state);
     }
 
     pub fn undo(&mut self) -> bool {
-        unimplemented!()
+        if self.history.is_empty() {
+            false
+        } else {
+            let history = self.history.pop_front().unwrap();
+            self.board = history.board;
+            self.score = history.score;
+            true
+        }
     }
 
     fn reverse(&mut self) {
@@ -149,7 +156,7 @@ impl Game {
         swap(&mut self.board, &mut self.transpose);
     }
 
-    fn spawn(&mut self) -> Spawn {
+    fn spawn(&mut self) {
         let (mut i, mut j) = (
             self.rng.next_u32() as usize % self.board.len(),
             self.rng.next_u32() as usize % self.board[0].len(),
@@ -164,15 +171,20 @@ impl Game {
         let value = if self.rng.next_u32() % 10 == 0 { 4 } else { 2 };
         self.board[i][j] = value;
         self.score += value;
-        Spawn {
-            value,
-            coord: Coord { i, j },
-        }
     }
 }
 
 impl Default for Game {
     fn default() -> Self {
         Self::new(4, 4, 1).unwrap()
+    }
+}
+
+impl History {
+    fn new(game: &Game) -> Self {
+        Self {
+            score: game.score,
+            board: game.board.clone(),
+        }
     }
 }
