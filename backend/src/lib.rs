@@ -100,11 +100,11 @@ impl Game {
     fn move_left(&mut self) -> bool {
         let mut moved = false;
         for row in self.board.iter_mut() {
-            let mut last_occupied = if row[0] == 0 { usize::MAX } else { 0 };
-            for j in 1..row.len() {
+            let mut first_empty = row.iter().position(|&v| v == 0).unwrap_or(row.len());
+            for j in first_empty + 1..row.len() {
                 if row[j] != 0 {
-                    last_occupied = last_occupied.wrapping_add(1);
-                    row.swap(last_occupied, j);
+                    row.swap(first_empty, j);
+                    first_empty += 1;
                     moved = true;
                 }
             }
