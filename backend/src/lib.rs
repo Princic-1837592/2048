@@ -88,9 +88,11 @@ impl Game {
                 self.transpose();
             }
         };
-        self.spawn();
-        if moved && self.max_history > 0 {
-            self.add_to_history(before);
+        if moved {
+            self.spawn();
+            if self.max_history > 0 {
+                self.add_to_history(before);
+            }
         }
         moved
     }
