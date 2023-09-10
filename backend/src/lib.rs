@@ -171,6 +171,22 @@ impl Game {
         self.board[i][j] = value;
         self.score += value;
     }
+
+    pub fn score(&self) -> usize {
+        self.score
+    }
+
+    pub fn height(&self) -> usize {
+        self.board.len()
+    }
+
+    pub fn width(&self) -> usize {
+        self.board[0].len()
+    }
+
+    pub fn board(&self) -> &Vec<Vec<usize>> {
+        &self.board
+    }
 }
 
 impl Default for Game {
