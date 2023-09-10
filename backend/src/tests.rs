@@ -27,7 +27,7 @@ fn push() {
             vec![0, 2, 0, 0],
         ]
     );
-    assert_eq!(game.score, 4);
+    assert_eq!(game.score, 0);
     assert_eq!(game.history.len(), 0);
 
     assert!(game.push(Direction::L));
@@ -40,7 +40,7 @@ fn push() {
             vec![2, 0, 0, 0],
         ]
     );
-    assert_eq!(game.score, 6);
+    assert_eq!(game.score, 0);
     assert_eq!(game.history.len(), 1);
 
     assert!(game.push(Direction::L));
@@ -53,7 +53,7 @@ fn push() {
             vec![2, 2, 0, 0],
         ]
     );
-    assert_eq!(game.score, 8);
+    assert_eq!(game.score, 4);
     assert_eq!(game.history.len(), 2);
 
     assert!(game.push(Direction::L));
@@ -66,7 +66,7 @@ fn push() {
             vec![4, 0, 0, 0],
         ]
     );
-    assert_eq!(game.score, 10);
+    assert_eq!(game.score, 4 + 4);
     assert_eq!(game.history.len(), 2);
 
     assert!(game.push(Direction::D));
@@ -79,7 +79,7 @@ fn push() {
             vec![8, 0, 0, 0],
         ]
     );
-    assert_eq!(game.score, 12);
+    assert_eq!(game.score, 4 + 4 + 8);
     assert_eq!(game.history.len(), 2);
 
     assert!(game.push(Direction::R));
@@ -92,7 +92,7 @@ fn push() {
             vec![0, 0, 0, 8],
         ]
     );
-    assert_eq!(game.score, 14);
+    assert_eq!(game.score, 4 + 4 + 8);
     assert_eq!(game.history.len(), 2);
 
     assert!(game.push(Direction::U));
@@ -105,7 +105,7 @@ fn push() {
             vec![0, 0, 0, 0],
         ]
     );
-    assert_eq!(game.score, 16);
+    assert_eq!(game.score, 4 + 4 + 8 + 4);
     assert_eq!(game.history.len(), 2);
 
     assert!(game.undo());
@@ -118,7 +118,7 @@ fn push() {
             vec![0, 0, 0, 8],
         ]
     );
-    assert_eq!(game.score, 14);
+    assert_eq!(game.score, 4 + 4 + 8);
     assert_eq!(game.history.len(), 1);
 
     assert!(game.undo());
@@ -131,7 +131,7 @@ fn push() {
             vec![8, 0, 0, 0],
         ]
     );
-    assert_eq!(game.score, 12);
+    assert_eq!(game.score, 4 + 4 + 8);
     assert_eq!(game.history.len(), 0);
 
     assert!(!game.undo());
@@ -144,7 +144,7 @@ fn push() {
             vec![8, 0, 0, 0],
         ]
     );
-    assert_eq!(game.score, 12);
+    assert_eq!(game.score, 4 + 4 + 8);
     assert_eq!(game.history.len(), 0);
 
     assert!(game.push(Direction::U));
@@ -157,7 +157,7 @@ fn push() {
             vec![0, 0, 2, 0],
         ]
     );
-    assert_eq!(game.score, 14);
+    assert_eq!(game.score, 4 + 4 + 8 + 4);
     assert_eq!(game.history.len(), 1);
 
     assert!(game.undo());
@@ -170,7 +170,7 @@ fn push() {
             vec![8, 0, 0, 0],
         ]
     );
-    assert_eq!(game.score, 12);
+    assert_eq!(game.score, 4 + 4 + 8);
     assert_eq!(game.history.len(), 0);
 
     assert!(!game.push(Direction::L));
@@ -183,7 +183,7 @@ fn push() {
             vec![8, 0, 0, 0],
         ]
     );
-    assert_eq!(game.score, 12);
+    assert_eq!(game.score, 4 + 4 + 8);
     assert_eq!(game.history.len(), 0);
 
     assert!(!game.push(Direction::L));
@@ -196,7 +196,7 @@ fn push() {
             vec![8, 0, 0, 0],
         ]
     );
-    assert_eq!(game.score, 12);
+    assert_eq!(game.score, 4 + 4 + 8);
     assert_eq!(game.history.len(), 0);
 
     assert!(game.push(Direction::D));
@@ -209,7 +209,7 @@ fn push() {
             vec![8, 0, 2, 0],
         ]
     );
-    assert_eq!(game.score, 14);
+    assert_eq!(game.score, 4 + 4 + 8 + 4);
     assert_eq!(game.history.len(), 1);
 
     assert!(!game.push(Direction::D));
@@ -222,6 +222,6 @@ fn push() {
             vec![8, 0, 2, 0],
         ]
     );
-    assert_eq!(game.score, 14);
+    assert_eq!(game.score, 4 + 4 + 8 + 4);
     assert_eq!(game.history.len(), 1);
 }
