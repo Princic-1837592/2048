@@ -118,6 +118,7 @@ impl Game {
             for j in 0..row.len() - 1 {
                 if row[j] != 0 && row[j] == row[j + 1] {
                     row[j] *= 2;
+                    self.score += row[j];
                     row[j + 1] = 0;
                     result = true;
                 }
@@ -171,7 +172,6 @@ impl Game {
         }
         let value = if self.rng.next_u32() % 10 == 0 { 4 } else { 2 };
         self.board[i][j] = value;
-        self.score += value;
     }
 
     pub fn score(&self) -> usize {
