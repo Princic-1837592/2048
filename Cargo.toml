@@ -1,5 +1,6 @@
 [workspace]
 members = [
     "backend",
-    "tui-frontend"
+    "tui-frontend",
+    "cursive-frontend",
 ]
