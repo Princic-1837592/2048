@@ -59,6 +59,7 @@ impl Game {
     }
 
     pub fn push(&mut self, direction: Direction) -> bool {
+        let before = self.clone();
         match direction {
             Direction::U => {
                 self.reverse();
@@ -71,10 +72,10 @@ impl Game {
                 self.reverse();
             }
         };
-        let mut result = false;
-        result |= self.move_left();
-        result |= self.merge_left();
-        result |= self.move_left();
+        let mut moved = false;
+        moved |= self.move_left();
+        moved |= self.merge_left();
+        moved |= self.move_left();
         match direction {
             Direction::U => {
                 self.transpose();
@@ -88,7 +89,10 @@ impl Game {
             }
         };
         self.spawn();
-        result
+        if moved {
+            self.add_to_history(before);
+        }
+        moved
     }
 
     fn move_left(&mut self) -> bool {
@@ -120,41 +124,16 @@ impl Game {
         result
     }
 
-    fn add_to_history(&mut self) {
+    fn add_to_history(&mut self, state: Self) {
         if self.history.len() == self.history.capacity() {
             self.history.pop_back();
         }
-        self.history.push_front(self.clone());
-        // todo questo andrebbe fatto prima della mossa,
-        // ma la mossa potrebbe andare a vuoto (non si muove niente)
-        // quindi bisognerebbe tornare indietro
+        self.history.push_front(state);
     }
 
     pub fn undo(&mut self) -> bool {
         unimplemented!()
     }
-
-    // fn merge_right(&mut self) {
-    //     self.mirror();
-    //     self.merge_left();
-    //     self.mirror();
-    // }
-    //
-    // fn merge_down(&mut self) {
-    //     self.transpose();
-    //     self.mirror();
-    //     self.merge_left();
-    //     self.mirror();
-    //     self.transpose();
-    // }
-    //
-    // fn merge_up(&mut self) {
-    //     self.mirror();
-    //     self.transpose();
-    //     self.merge_left();
-    //     self.transpose();
-    //     self.mirror();
-    // }
 
     fn reverse(&mut self) {
         self.board.iter_mut().for_each(|r| r.reverse())
@@ -169,15 +148,6 @@ impl Game {
         }
         swap(&mut self.board, &mut self.transpose);
     }
-
-    // fn transpose_from_to(from: &Vec<Vec<usize>>, to: &mut [Vec<usize>]) {
-    //     for i in 0..from.len() {
-    //         #[allow(clippy::needless_range_loop)]
-    //         for j in 0..from[0].len() {
-    //             to[j][i] = from[i][j];
-    //         }
-    //     }
-    // }
 
     fn spawn(&mut self) -> Spawn {
         let (mut i, mut j) = (
