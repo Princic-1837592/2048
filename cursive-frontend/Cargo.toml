@@ -6,4 +6,6 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-cursive = { version = "0.20.0",features = ["pancurses-backend"],default-features = false }
+cursive = { version = "0.20.0", features = ["pancurses-backend"], default-features = false }
+backend = { path = "../backend" }
+lazy_static = "1.4.0"
