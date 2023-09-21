@@ -11,8 +11,11 @@ use lazy_static::lazy_static;
 
 const HISTORY_WIDTH: usize = 13;
 const SCORE_WIDTH: usize = 11;
+const SCORE_HEIGHT: usize = 3;
 const INTER_SPACE: usize = 2;
 const OUTER_SPACE: usize = 1;
+const CELL_EXT_WIDTH: usize = 13;
+const CELL_EXT_HEIGHT: usize = 7;
 
 lazy_static! {
     static ref COLORS: [ColorStyle; 13] = [
@@ -45,8 +48,8 @@ impl Container {
         let height = game.height();
         Container {
             game,
-            width: width * 9 + width + 1,
-            height: height * 5 + height + 1,
+            width: width * (CELL_EXT_WIDTH - 1) + 1,
+            height: height * (CELL_EXT_HEIGHT - 1) + 1,
         }
     }
 
@@ -54,21 +57,34 @@ impl Container {
         let (width, height) = (self.game.width(), self.game.height());
         for i in 0..height {
             for j in 0..width {
-                printer.print_box((j * 11 - j, i * 7 - i), (11, 7), false);
+                printer.print_box(
+                    (j * CELL_EXT_WIDTH - j, i * CELL_EXT_HEIGHT - i),
+                    (CELL_EXT_WIDTH, CELL_EXT_HEIGHT),
+                    false,
+                );
             }
         }
         for i in 1..height {
             for j in 1..width {
-                printer.print((j * 11 - j, i * 7 - i), "\u{253c}");
+                printer.print(
+                    (j * CELL_EXT_WIDTH - j, i * CELL_EXT_HEIGHT - i),
+                    "\u{253c}",
+                );
             }
         }
         for j in 1..width {
-            printer.print((j * 11 - j, 0), "\u{252c}");
-            printer.print((j * 11 - j, height * 7 - height), "\u{2534}");
+            printer.print((j * CELL_EXT_WIDTH - j, 0), "\u{252c}");
+            printer.print(
+                (j * CELL_EXT_WIDTH - j, height * CELL_EXT_HEIGHT - height),
+                "\u{2534}",
+            );
         }
         for i in 1..height {
-            printer.print((0, i * 7 - i), "\u{251c}");
-            printer.print((width * 11 - width, i * 7 - i), "\u{2524}");
+            printer.print((0, i * CELL_EXT_HEIGHT - i), "\u{251c}");
+            printer.print(
+                (width * CELL_EXT_WIDTH - width, i * CELL_EXT_HEIGHT - i),
+                "\u{2524}",
+            );
         }
     }
 
@@ -76,7 +92,10 @@ impl Container {
         let value = self.game.get(i, j);
         let color = COLORS[value.checked_ilog2().unwrap_or(0) as usize];
         for line in 0..5 {
-            let coord = (j * 10 + 1, i * 6 + line + 1);
+            let coord = (
+                j * (CELL_EXT_WIDTH - 1) + 1,
+                i * (CELL_EXT_HEIGHT - 1) + line + 1,
+            );
             if value == 0 {
                 printer.print(coord, "         ");
             } else {
@@ -84,9 +103,13 @@ impl Container {
                     printer.print(
                         coord,
                         &if line == 2 && value != 0 {
-                            format!("{:^9}", self.game.get(i, j))
+                            format!(
+                                "{:^width$}",
+                                self.game.get(i, j),
+                                width = CELL_EXT_WIDTH - 2
+                            )
                         } else {
-                            " ".repeat(9)
+                            " ".repeat(CELL_EXT_WIDTH - 2)
                         },
                     );
                 });
@@ -128,7 +151,7 @@ impl Container {
     fn draw_score(&self, printer: &Printer) {
         let mut dialog = Dialog::text(self.game.score().to_string())
             .title("Score")
-            .fixed_size((SCORE_WIDTH, 3));
+            .fixed_size((SCORE_WIDTH, SCORE_HEIGHT));
         dialog.layout(printer.offset);
         dialog.draw(printer);
     }
