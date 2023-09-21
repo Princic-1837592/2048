@@ -166,10 +166,10 @@ impl View for Container {
 
     fn on_event(&mut self, event: Event) -> EventResult {
         match event {
-            Event::Char('l') | Event::Key(Key::Left) => self.game.push(Direction::L),
-            Event::Char('r') | Event::Key(Key::Right) => self.game.push(Direction::R),
-            Event::Char('u') | Event::Key(Key::Up) => self.game.push(Direction::U),
-            Event::Char('d') | Event::Key(Key::Down) => self.game.push(Direction::D),
+            Event::Char('w') | Event::Key(Key::Up) => self.game.push(Direction::U),
+            Event::Char('a') | Event::Key(Key::Left) => self.game.push(Direction::L),
+            Event::Char('s') | Event::Key(Key::Down) => self.game.push(Direction::D),
+            Event::Char('d') | Event::Key(Key::Right) => self.game.push(Direction::R),
             Event::Char('n') => {
                 self.game = Game::default();
                 false
