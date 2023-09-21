@@ -195,6 +195,10 @@ impl Game {
     pub fn history(&self) -> Vec<Direction> {
         self.history.iter().rev().map(|h| h.direction).collect()
     }
+
+    pub fn get(&self, i: usize, j: usize) -> usize {
+        self.board[i][j]
+    }
 }
 
 impl Default for Game {
