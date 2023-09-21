@@ -19,8 +19,10 @@ pub struct Game {
 struct History {
     score: usize,
     board: Vec<Vec<usize>>,
+    direction: Direction,
 }
 
+#[derive(Copy, Clone, Debug)]
 pub enum Direction {
     U,
     R,
@@ -59,7 +61,7 @@ impl Game {
     }
 
     pub fn push(&mut self, direction: Direction) -> bool {
-        let before = History::new(self);
+        let before = History::new(self, direction);
         match direction {
             Direction::U => {
                 self.reverse();
@@ -189,6 +191,10 @@ impl Game {
     pub fn board(&self) -> &Vec<Vec<usize>> {
         &self.board
     }
+
+    pub fn history(&self) -> Vec<Direction> {
+        self.history.iter().rev().map(|h| h.direction).collect()
+    }
 }
 
 impl Default for Game {
@@ -198,10 +204,11 @@ impl Default for Game {
 }
 
 impl History {
-    fn new(game: &Game) -> Self {
+    fn new(game: &Game, direction: Direction) -> Self {
         Self {
             score: game.score,
             board: game.board.clone(),
+            direction,
         }
     }
 }
