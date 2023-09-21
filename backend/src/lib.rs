@@ -19,6 +19,7 @@ pub struct Game {
 struct History {
     score: usize,
     board: Vec<Vec<usize>>,
+    rng: StdRng,
     direction: Direction,
 }
 
@@ -61,7 +62,7 @@ impl Game {
     }
 
     pub fn push(&mut self, direction: Direction) -> bool {
-        let before = History::new(self, direction);
+        let before = History::new(self, self.rng.clone(), direction);
         match direction {
             Direction::U => {
                 self.reverse();
@@ -143,6 +144,7 @@ impl Game {
             let history = self.history.pop_front().unwrap();
             self.board = history.board;
             self.score = history.score;
+            self.rng = history.rng;
             true
         }
     }
@@ -208,10 +210,11 @@ impl Default for Game {
 }
 
 impl History {
-    fn new(game: &Game, direction: Direction) -> Self {
+    fn new(game: &Game, rng: StdRng, direction: Direction) -> Self {
         Self {
             score: game.score,
             board: game.board.clone(),
+            rng,
             direction,
         }
     }
