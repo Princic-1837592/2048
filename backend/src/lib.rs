@@ -5,6 +5,9 @@ use rand::{rngs::StdRng, RngCore, SeedableRng};
 #[cfg(test)]
 mod tests;
 
+pub const MIN_SIZE: usize = 3;
+pub const MAX_SIZE: usize = 10;
+
 #[derive(Clone, Debug)]
 pub struct Game {
     score: usize,
@@ -38,13 +41,13 @@ impl Game {
     }
 
     /// Create a new game.
-    /// `width` and `height` must be at least 3 and at most 10.
+    /// `width` and `height` must be at least [`MIN_SIZE`] and at most [`MAX_SIZE`].
     ///
     /// `max_history` can be 0 to disable `undo`.
     /// History vector won't be allocated to `max_history` capacity,
     /// so it's safe to pass `usize::MAX` for a virtually infinite history
     pub fn from_seed(height: usize, width: usize, max_history: usize, seed: u64) -> Option<Self> {
-        if !(3..=10).contains(&width) || !(3..=10).contains(&height) {
+        if !(MIN_SIZE..=MAX_SIZE).contains(&width) || !(MIN_SIZE..=MAX_SIZE).contains(&height) {
             None
         } else {
             let mut result = Self {
@@ -155,7 +158,6 @@ impl Game {
 
     fn transpose(&mut self) {
         for i in 0..self.board.len() {
-            #[allow(clippy::needless_range_loop)]
             for j in 0..self.board[0].len() {
                 self.transpose[j][i] = self.board[i][j];
             }
