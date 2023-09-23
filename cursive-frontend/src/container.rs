@@ -218,6 +218,10 @@ impl View for Container {
         Container::draw_sliders(self, &sliders_printer);
     }
 
+    fn layout(&mut self, constraints: Vec2) {
+        self.sliders.layout(constraints);
+    }
+
     fn required_size(&mut self, constraint: Vec2) -> Vec2 {
         (
             OUTER_SPACE
@@ -259,10 +263,6 @@ impl View for Container {
             _ => {}
         };
         EventResult::Ignored
-    }
-
-    fn layout(&mut self, constraints: Vec2) {
-        self.sliders.layout(constraints);
     }
 
     fn call_on_any(&mut self, selector: &Selector, cb: AnyCb) {
