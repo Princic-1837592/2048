@@ -54,28 +54,26 @@ impl Container {
         let mut sliders = LinearLayout::vertical();
         sliders.add_child(
             Dialog::around(
-                SliderView::horizontal((backend::MIN_SIZE..=backend::MAX_SIZE).count())
-                    // Sets the initial value
-                    .value(backend::MIN_SIZE)
-                    .on_change(|s, v| {
+                SliderView::horizontal((backend::MIN_SIZE..=backend::MAX_SIZE).count()).on_change(
+                    |s, v| {
                         println!("Width: {}", v);
                         let title = format!("Width: {}", v);
-                        s.call_on_name("container", |view: &mut Dialog| view.set_title(title));
-                    }),
+                        s.call_on_name("width", |view: &mut Dialog| view.set_title(title));
+                    },
+                ),
             )
             .title(format!("Width: {}", backend::MIN_SIZE))
             .with_name("width"),
         );
         sliders.add_child(
             Dialog::around(
-                SliderView::horizontal((backend::MIN_SIZE..=backend::MAX_SIZE).count())
-                    // Sets the initial value
-                    .value(backend::MIN_SIZE)
-                    .on_change(|s, v| {
+                SliderView::horizontal((backend::MIN_SIZE..=backend::MAX_SIZE).count()).on_change(
+                    |s, v| {
                         println!("Height: {}", v);
                         let title = format!("Height: {}", v);
                         s.call_on_name("height", |view: &mut Dialog| view.set_title(title));
-                    }),
+                    },
+                ),
             )
             .title(format!("Height: {}", backend::MIN_SIZE))
             .with_name("height"),
@@ -266,7 +264,6 @@ impl View for Container {
     }
 
     fn call_on_any(&mut self, selector: &Selector, cb: AnyCb) {
-        println!("call_on_any");
         self.sliders.call_on_any(selector, cb);
     }
 }
