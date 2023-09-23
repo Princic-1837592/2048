@@ -37,61 +37,50 @@ lazy_static! {
 
 pub(crate) struct Container {
     game: Game,
-    width: usize,
-    height: usize,
     sliders: LinearLayout,
-    board_offset: Vec2,
-    history_offset: Vec2,
-    score_offset: Vec2,
-    sliders_offset: Vec2,
+    next_width: usize,
+    next_height: usize,
 }
 
 impl Container {
     pub(crate) fn new() -> Container {
         let game = Game::default();
-        let width = game.width() * (CELL_EXT_WIDTH - 1) + 1;
-        let height = game.height();
         let mut sliders = LinearLayout::vertical();
         sliders.add_child(
             Dialog::around(
-                SliderView::horizontal((backend::MIN_SIZE..=backend::MAX_SIZE).count()).on_change(
-                    |s, v| {
-                        println!("Width: {}", v);
-                        let title = format!("Width: {}", v);
+                SliderView::horizontal((backend::MIN_SIZE..=backend::MAX_SIZE).count())
+                    .value(backend::DEFAULT_SIZE - backend::MIN_SIZE)
+                    .on_change(|s, v| {
+                        let title = format!("Width: {}", v + backend::MIN_SIZE);
                         s.call_on_name("width", |view: &mut Dialog| view.set_title(title));
-                    },
-                ),
+                        s.call_on_name("container", |view: &mut Container| {
+                            view.next_width = v + backend::MIN_SIZE;
+                        });
+                    }),
             )
-            .title(format!("Width: {}", backend::MIN_SIZE))
+            .title(format!("Width: {}", backend::DEFAULT_SIZE))
             .with_name("width"),
         );
         sliders.add_child(
             Dialog::around(
-                SliderView::horizontal((backend::MIN_SIZE..=backend::MAX_SIZE).count()).on_change(
-                    |s, v| {
-                        println!("Height: {}", v);
-                        let title = format!("Height: {}", v);
+                SliderView::horizontal((backend::MIN_SIZE..=backend::MAX_SIZE).count())
+                    .value(backend::DEFAULT_SIZE - backend::MIN_SIZE)
+                    .on_change(|s, v| {
+                        let title = format!("Height: {}", v + backend::MIN_SIZE);
                         s.call_on_name("height", |view: &mut Dialog| view.set_title(title));
-                    },
-                ),
+                        s.call_on_name("container", |view: &mut Container| {
+                            view.next_height = v + backend::MIN_SIZE;
+                        });
+                    }),
             )
-            .title(format!("Height: {}", backend::MIN_SIZE))
+            .title(format!("Height: {}", backend::DEFAULT_SIZE))
             .with_name("height"),
         );
-        let (x, y) = (OUTER_SPACE, OUTER_SPACE);
-        let board_padding = Vec2::new(x, y);
-        let history_padding = Vec2::new(board_padding.x + width + INTER_SPACE, y);
-        let score_offset = Vec2::new(history_padding.x + HISTORY_WIDTH + INTER_SPACE, y);
-        let sliders_offset = Vec2::new(score_offset.x, score_offset.y + SCORE_HEIGHT);
         Container {
             game,
-            width,
-            height: height * (CELL_EXT_HEIGHT - 1) + 1,
             sliders,
-            board_offset: board_padding,
-            history_offset: history_padding,
-            score_offset,
-            sliders_offset,
+            next_width: backend::DEFAULT_SIZE,
+            next_height: backend::DEFAULT_SIZE,
         }
     }
 
@@ -201,14 +190,33 @@ impl Container {
     fn draw_sliders(&self, printer: &Printer) {
         self.sliders.draw(printer);
     }
+
+    fn width(&self) -> usize {
+        self.game.width() * (CELL_EXT_WIDTH - 1) + 1
+    }
+
+    fn height(&self) -> usize {
+        self.game.height() * (CELL_EXT_HEIGHT - 1) + 1
+    }
+
+    fn offsets(&self) -> (Vec2, Vec2, Vec2, Vec2) {
+        let (x, y) = (OUTER_SPACE, OUTER_SPACE);
+        let board_padding = Vec2::new(x, y);
+        let history_padding = Vec2::new(board_padding.x + self.width() + INTER_SPACE, y);
+        let score_offset = Vec2::new(history_padding.x + HISTORY_WIDTH + INTER_SPACE, y);
+        let sliders_offset = Vec2::new(score_offset.x, score_offset.y + SCORE_HEIGHT);
+        (board_padding, history_padding, score_offset, sliders_offset)
+    }
 }
 
 impl View for Container {
     fn draw(&self, printer: &Printer) {
-        let board_printer = printer.offset(self.board_offset);
-        let history_printer = printer.offset(self.history_offset);
-        let score_printer = printer.offset(self.score_offset);
-        let sliders_printer = printer.offset(self.sliders_offset);
+        let (board_offset, history_offset, score_offset, sliders_offset) = self.offsets();
+
+        let board_printer = printer.offset(board_offset);
+        let history_printer = printer.offset(history_offset);
+        let score_printer = printer.offset(score_offset);
+        let sliders_printer = printer.offset(sliders_offset);
 
         Container::draw_board(self, &board_printer);
         Container::draw_history(self, &history_printer);
@@ -223,13 +231,13 @@ impl View for Container {
     fn required_size(&mut self, constraint: Vec2) -> Vec2 {
         (
             OUTER_SPACE
-                + self.width
+                + self.width()
                 + INTER_SPACE
                 + HISTORY_WIDTH
                 + INTER_SPACE
                 + SCORE_WIDTH.max(self.sliders.required_size(constraint).x)
                 + OUTER_SPACE,
-            (OUTER_SPACE + self.height + OUTER_SPACE).max(10),
+            (OUTER_SPACE + self.height() + OUTER_SPACE).max(10),
         )
             .into()
     }
@@ -249,14 +257,13 @@ impl View for Container {
                 self.game.push(Direction::R);
             }
             Event::Char('n') => {
-                self.game = Game::default();
+                self.game = Game::new(self.next_width, self.next_height, 1).unwrap_or_default();
             }
             Event::Char('z') => {
                 self.game.undo();
             }
             event @ Event::Mouse { .. } => {
-                self.sliders
-                    .on_event(event.relativized(self.sliders_offset));
+                return self.sliders.on_event(event.relativized(self.offsets().3))
             }
             _ => {}
         };
