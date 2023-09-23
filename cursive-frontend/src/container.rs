@@ -1,10 +1,10 @@
 use backend::{Direction, Game};
 use cursive::{
-    event::{Event, EventResult, Key},
+    event::{AnyCb, Event, EventResult, Key},
     theme::{Color, ColorStyle, PaletteColor},
-    traits::Resizable,
-    view::SizeConstraint,
-    views::Dialog,
+    traits::{Nameable, Resizable},
+    view::{Selector, SizeConstraint},
+    views::{Dialog, LinearLayout, SliderView},
     Printer, Vec2, View,
 };
 use lazy_static::lazy_static;
@@ -39,17 +39,61 @@ pub(crate) struct Container {
     game: Game,
     width: usize,
     height: usize,
+    sliders: LinearLayout,
+    board_offset: Vec2,
+    history_offset: Vec2,
+    score_offset: Vec2,
+    sliders_offset: Vec2,
 }
 
 impl Container {
     pub(crate) fn new() -> Container {
         let game = Game::default();
-        let width = game.width();
+        let width = game.width() * (CELL_EXT_WIDTH - 1) + 1;
         let height = game.height();
+        let mut sliders = LinearLayout::vertical();
+        sliders.add_child(
+            Dialog::around(
+                SliderView::horizontal((backend::MIN_SIZE..=backend::MAX_SIZE).count())
+                    // Sets the initial value
+                    .value(backend::MIN_SIZE)
+                    .on_change(|s, v| {
+                        println!("Width: {}", v);
+                        let title = format!("Width: {}", v);
+                        s.call_on_name("container", |view: &mut Dialog| view.set_title(title));
+                    }),
+            )
+            .title(format!("Width: {}", backend::MIN_SIZE))
+            .with_name("width"),
+        );
+        sliders.add_child(
+            Dialog::around(
+                SliderView::horizontal((backend::MIN_SIZE..=backend::MAX_SIZE).count())
+                    // Sets the initial value
+                    .value(backend::MIN_SIZE)
+                    .on_change(|s, v| {
+                        println!("Height: {}", v);
+                        let title = format!("Height: {}", v);
+                        s.call_on_name("height", |view: &mut Dialog| view.set_title(title));
+                    }),
+            )
+            .title(format!("Height: {}", backend::MIN_SIZE))
+            .with_name("height"),
+        );
+        let (x, y) = (OUTER_SPACE, OUTER_SPACE);
+        let board_padding = Vec2::new(x, y);
+        let history_padding = Vec2::new(board_padding.x + width + INTER_SPACE, y);
+        let score_offset = Vec2::new(history_padding.x + HISTORY_WIDTH + INTER_SPACE, y);
+        let sliders_offset = Vec2::new(score_offset.x, score_offset.y + SCORE_HEIGHT);
         Container {
             game,
-            width: width * (CELL_EXT_WIDTH - 1) + 1,
+            width,
             height: height * (CELL_EXT_HEIGHT - 1) + 1,
+            sliders,
+            board_offset: board_padding,
+            history_offset: history_padding,
+            score_offset,
+            sliders_offset,
         }
     }
 
@@ -155,32 +199,33 @@ impl Container {
         dialog.layout(printer.offset);
         dialog.draw(printer);
     }
+
+    fn draw_sliders(&self, printer: &Printer) {
+        self.sliders.draw(printer);
+    }
 }
 
 impl View for Container {
     fn draw(&self, printer: &Printer) {
-        let (x, y) = (OUTER_SPACE, OUTER_SPACE);
-        let board_padding = Vec2::new(x, y);
-        let history_padding = Vec2::new(board_padding.x + self.width + INTER_SPACE, y);
-        let score_padding = Vec2::new(history_padding.x + HISTORY_WIDTH + INTER_SPACE, y);
-
-        let board_printer = printer.offset(board_padding);
-        let history_printer = printer.offset(history_padding);
-        let score_printer = printer.offset(score_padding);
+        let board_printer = printer.offset(self.board_offset);
+        let history_printer = printer.offset(self.history_offset);
+        let score_printer = printer.offset(self.score_offset);
+        let sliders_printer = printer.offset(self.sliders_offset);
 
         Container::draw_board(self, &board_printer);
         Container::draw_history(self, &history_printer);
         Container::draw_score(self, &score_printer);
+        Container::draw_sliders(self, &sliders_printer);
     }
 
-    fn required_size(&mut self, _constraint: Vec2) -> Vec2 {
+    fn required_size(&mut self, constraint: Vec2) -> Vec2 {
         (
             OUTER_SPACE
                 + self.width
                 + INTER_SPACE
                 + HISTORY_WIDTH
                 + INTER_SPACE
-                + SCORE_WIDTH
+                + SCORE_WIDTH.max(self.sliders.required_size(constraint).x)
                 + OUTER_SPACE,
             (OUTER_SPACE + self.height + OUTER_SPACE).max(10),
         )
@@ -189,17 +234,39 @@ impl View for Container {
 
     fn on_event(&mut self, event: Event) -> EventResult {
         match event {
-            Event::Char('w') | Event::Key(Key::Up) => self.game.push(Direction::U),
-            Event::Char('a') | Event::Key(Key::Left) => self.game.push(Direction::L),
-            Event::Char('s') | Event::Key(Key::Down) => self.game.push(Direction::D),
-            Event::Char('d') | Event::Key(Key::Right) => self.game.push(Direction::R),
+            Event::Char('w') | Event::Key(Key::Up) => {
+                self.game.push(Direction::U);
+            }
+            Event::Char('a') | Event::Key(Key::Left) => {
+                self.game.push(Direction::L);
+            }
+            Event::Char('s') | Event::Key(Key::Down) => {
+                self.game.push(Direction::D);
+            }
+            Event::Char('d') | Event::Key(Key::Right) => {
+                self.game.push(Direction::R);
+            }
             Event::Char('n') => {
                 self.game = Game::default();
-                false
             }
-            Event::Char('z') => self.game.undo(),
-            _ => false,
+            Event::Char('z') => {
+                self.game.undo();
+            }
+            event @ Event::Mouse { .. } => {
+                self.sliders
+                    .on_event(event.relativized(self.sliders_offset));
+            }
+            _ => {}
         };
         EventResult::Ignored
+    }
+
+    fn layout(&mut self, constraints: Vec2) {
+        self.sliders.layout(constraints);
+    }
+
+    fn call_on_any(&mut self, selector: &Selector, cb: AnyCb) {
+        println!("call_on_any");
+        self.sliders.call_on_any(selector, cb);
     }
 }
