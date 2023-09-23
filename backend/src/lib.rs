@@ -6,6 +6,7 @@ use rand::{rngs::StdRng, RngCore, SeedableRng};
 mod tests;
 
 pub const MIN_SIZE: usize = 3;
+pub const DEFAULT_SIZE: usize = 4;
 pub const MAX_SIZE: usize = 10;
 
 #[derive(Clone, Debug)]
