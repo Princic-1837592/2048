@@ -193,6 +193,10 @@ impl Game {
         self.board[0].len()
     }
 
+    pub fn max_history(&self) -> usize {
+        self.max_history
+    }
+
     pub fn board(&self) -> &Vec<Vec<usize>> {
         &self.board
     }
