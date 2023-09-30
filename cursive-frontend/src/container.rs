@@ -187,14 +187,11 @@ impl Container {
             .map(|h| format!("{:?}", h))
             .collect::<Vec<_>>()
             .join("\n");
-        let mut dialog = Dialog::around(
-            TextView::new(if history.is_empty() {
-                "no history"
-            } else {
-                &history
-            })
-            .scrollable(),
-        )
+        let mut dialog = Dialog::around(TextView::new(if history.is_empty() {
+            "no history"
+        } else {
+            &history
+        }))
         .title("History")
         .fixed_size((HISTORY_WIDTH, HISTORY_HEIGHT));
         dialog.layout(printer.offset);
