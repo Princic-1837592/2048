@@ -2,7 +2,7 @@ use backend::{Direction, Game};
 use cursive::{
     event::{AnyCb, Event, EventResult, Key},
     theme::{Color, ColorStyle, PaletteColor},
-    traits::{Nameable, Resizable, Scrollable},
+    traits::{Nameable, Resizable},
     view::{Selector, SizeConstraint},
     views::{Dialog, LinearLayout, SliderView, TextView},
     Printer, Vec2, View,
