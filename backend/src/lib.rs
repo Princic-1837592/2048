@@ -65,7 +65,7 @@ impl Game {
         }
     }
 
-    pub fn push(&mut self, direction: Direction) -> bool {
+    pub fn push(&mut self, direction: Direction) -> Option<Vec<Vec<u8>>> {
         let before = History::new(self, self.rng.clone(), direction);
         match direction {
             Direction::U => {
@@ -80,19 +80,30 @@ impl Game {
             }
         };
         let mut moved = false;
-        moved |= self.move_left();
-        moved |= self.merge_left();
-        moved |= self.move_left();
+        let (this_moved, first_move) = self.move_left();
+        moved |= this_moved;
+        let (this_moved, merge) = self.merge_left();
+        moved |= this_moved;
+        let (this_moved, second_move) = self.move_left();
+        moved |= this_moved;
+        let mut steps = Self::merge_steps(first_move, merge, second_move);
         match direction {
             Direction::U => {
                 self.transpose();
+                transpose(&mut steps);
                 self.reverse();
+                reverse(&mut steps);
             }
-            Direction::R => self.reverse(),
+            Direction::R => {
+                self.reverse();
+                reverse(&mut steps);
+            }
             Direction::L => {}
             Direction::D => {
                 self.reverse();
+                reverse(&mut steps);
                 self.transpose();
+                transpose(&mut steps);
             }
         };
         if moved {
@@ -101,37 +112,41 @@ impl Game {
                 self.add_to_history(before);
             }
         }
-        moved
+        moved.then_some(steps)
     }
 
-    fn move_left(&mut self) -> bool {
+    fn move_left(&mut self) -> (bool, Vec<Vec<usize>>) {
+        let mut result = vec![vec![0; self.width()]; self.height()];
         let mut moved = false;
-        for row in self.board.iter_mut() {
+        for (i, row) in self.board.iter_mut().enumerate() {
             let mut first_empty = row.iter().position(|&v| v == 0).unwrap_or(row.len());
             for j in first_empty + 1..row.len() {
                 if row[j] != 0 {
                     row.swap(first_empty, j);
+                    result[i][j] = j - first_empty;
                     first_empty += 1;
                     moved = true;
                 }
             }
         }
-        moved
+        (moved, result)
     }
 
-    fn merge_left(&mut self) -> bool {
-        let mut result = false;
-        for row in self.board.iter_mut() {
+    fn merge_left(&mut self) -> (bool, Vec<Vec<usize>>) {
+        let mut result = vec![vec![0; self.width()]; self.height()];
+        let mut moved = false;
+        for (i, row) in self.board.iter_mut().enumerate() {
             for j in 0..row.len() - 1 {
                 if row[j] != 0 && row[j] == row[j + 1] {
                     row[j] *= 2;
                     self.score += row[j];
                     row[j + 1] = 0;
-                    result = true;
+                    result[i][j + 1] = 1;
+                    moved = true;
                 }
             }
         }
-        result
+        (moved, result)
     }
 
     fn add_to_history(&mut self, state: History) {
@@ -154,7 +169,7 @@ impl Game {
     }
 
     fn reverse(&mut self) {
-        self.board.iter_mut().for_each(|r| r.reverse())
+        reverse(&mut self.board)
     }
 
     fn transpose(&mut self) {
@@ -208,6 +223,49 @@ impl Game {
     pub fn get(&self, i: usize, j: usize) -> usize {
         self.board[i][j]
     }
+
+    fn merge_steps(
+        mut first_move: Vec<Vec<usize>>,
+        mut merge: Vec<Vec<usize>>,
+        mut second_move: Vec<Vec<usize>>,
+    ) -> Vec<Vec<u8>> {
+        let mut result = vec![vec![0; first_move[0].len()]; first_move.len()];
+        for (i, row) in result.iter_mut().enumerate() {
+            if i == 2 {
+                dbg!();
+            }
+            for (mut j, cell) in row.iter_mut().enumerate().rev() {
+                let mut total_steps = 0;
+                let steps = first_move[i][j];
+                total_steps += steps;
+                first_move[i][j] = 0;
+                j -= steps;
+                let steps = merge[i][j];
+                total_steps += steps;
+                merge[i][j] = 0;
+                j -= steps;
+                let steps = second_move[i][j];
+                total_steps += steps;
+                second_move[i][j] = 0;
+                *cell = total_steps as u8;
+            }
+        }
+        result
+    }
+}
+
+fn transpose<T: Copy>(matrix: &mut Vec<Vec<T>>) {
+    let mut result = vec![vec![matrix[0][0]; matrix.len()]; matrix[0].len()];
+    for (i, row) in matrix.iter().enumerate() {
+        for (j, value) in row.iter().enumerate() {
+            result[j][i] = *value;
+        }
+    }
+    swap(matrix, &mut result);
+}
+
+fn reverse<T>(matrix: &mut [Vec<T>]) {
+    matrix.iter_mut().for_each(|r| r.reverse())
 }
 
 impl Default for Game {
