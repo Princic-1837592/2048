@@ -35,6 +35,20 @@ pub enum Direction {
     D,
 }
 
+impl TryFrom<char> for Direction {
+    type Error = ();
+
+    fn try_from(value: char) -> Result<Self, Self::Error> {
+        match value {
+            'u' => Ok(Self::U),
+            'r' => Ok(Self::R),
+            'l' => Ok(Self::L),
+            'd' => Ok(Self::D),
+            _ => Err(()),
+        }
+    }
+}
+
 impl Game {
     /// Create a new game with a random seed
     pub fn new(height: usize, width: usize, max_history: usize) -> Option<Self> {
