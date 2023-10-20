@@ -54,6 +54,17 @@
     margin-right: 0;
 }
 
+.number {
+    position: absolute;
+    transition: 100ms;
+    transition-property: transform;
+    width: 107px;
+    height: 107px;
+    line-height: 107px;
+    border-radius: 3px;
+    border: 3px solid green;
+}
+
 .position-0-0 {
     transform: translate(0px, 0px);
 }
