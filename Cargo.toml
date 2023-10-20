@@ -3,4 +3,5 @@ members = [
     "backend",
     "tui-frontend",
     "cursive-frontend",
+    "wasm-frontend"
 ]
