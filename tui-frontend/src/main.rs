@@ -59,10 +59,10 @@ fn main() -> IOResult<()> {
             }) = read()?
             {
                 let moved = match code {
-                    KeyCode::Up | KeyCode::Char('w') => game.push(Direction::U),
-                    KeyCode::Left | KeyCode::Char('a') => game.push(Direction::L),
-                    KeyCode::Down | KeyCode::Char('s') => game.push(Direction::D),
-                    KeyCode::Right | KeyCode::Char('d') => game.push(Direction::R),
+                    KeyCode::Up | KeyCode::Char('w') => game.push(Direction::U).is_some(),
+                    KeyCode::Left | KeyCode::Char('a') => game.push(Direction::L).is_some(),
+                    KeyCode::Down | KeyCode::Char('s') => game.push(Direction::D).is_some(),
+                    KeyCode::Right | KeyCode::Char('d') => game.push(Direction::R).is_some(),
                     KeyCode::Char('z') => game.undo(),
                     KeyCode::Char('q') => break,
                     _ => false,
