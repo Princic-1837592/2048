@@ -55,6 +55,7 @@ impl TryFrom<char> for Direction {
 #[cfg_attr(target_family = "wasm", derive(Serialize))]
 pub struct PushResult {
     pub movements: Vec<Vec<u8>>,
+    pub merged: Vec<Vec<u32>>,
     pub spawned_row: usize,
     pub spawned_col: usize,
     pub spawned_value: u32,
@@ -107,28 +108,33 @@ impl Game {
         let mut moved = false;
         let (this_moved, first_move) = self.move_left();
         moved |= this_moved;
-        let (this_moved, merge) = self.merge_left();
+        let (this_moved, merge_move, mut merged) = self.merge_left();
         moved |= this_moved;
         let (this_moved, second_move) = self.move_left();
         moved |= this_moved;
-        let mut movements = Self::merge_movements(first_move, merge, second_move);
+        let mut movements = Self::merge_movements(first_move, merge_move, second_move);
         match direction {
             Direction::U => {
                 self.transpose();
                 transpose(&mut movements);
+                transpose(&mut merged);
                 self.reverse();
                 reverse(&mut movements);
+                reverse(&mut merged);
             }
             Direction::R => {
                 self.reverse();
                 reverse(&mut movements);
+                reverse(&mut merged);
             }
             Direction::L => {}
             Direction::D => {
                 self.reverse();
                 reverse(&mut movements);
+                reverse(&mut merged);
                 self.transpose();
                 transpose(&mut movements);
+                transpose(&mut merged);
             }
         };
         if moved {
@@ -141,6 +147,7 @@ impl Game {
                 spawned_row,
                 spawned_col,
                 spawned_value,
+                merged,
             })
         } else {
             None
@@ -164,8 +171,9 @@ impl Game {
         (moved, result)
     }
 
-    fn merge_left(&mut self) -> (bool, Vec<Vec<usize>>) {
+    fn merge_left(&mut self) -> (bool, Vec<Vec<usize>>, Vec<Vec<u32>>) {
         let mut result = vec![vec![0; self.width()]; self.height()];
+        let mut merged = vec![vec![0; self.width()]; self.height()];
         let mut moved = false;
         for (i, row) in self.board.iter_mut().enumerate() {
             for j in 0..row.len() - 1 {
@@ -174,11 +182,12 @@ impl Game {
                     self.score += row[j];
                     row[j + 1] = 0;
                     result[i][j + 1] = 1;
+                    merged[i][j] = row[j];
                     moved = true;
                 }
             }
         }
-        (moved, result)
+        (moved, result, merged)
     }
 
     fn add_to_history(&mut self, state: History) {

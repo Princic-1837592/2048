@@ -42,6 +42,12 @@ fn push() {
             spawned_row: 2,
             spawned_col: 2,
             spawned_value: 2,
+            merged: vec![
+                vec![0, 0, 0, 0],
+                vec![0, 0, 0, 0],
+                vec![0, 0, 0, 0],
+                vec![0, 0, 0, 0],
+            ]
         })
     );
     assert_eq!(
@@ -68,6 +74,12 @@ fn push() {
             spawned_row: 3,
             spawned_col: 1,
             spawned_value: 2,
+            merged: vec![
+                vec![0, 0, 0, 0],
+                vec![0, 0, 0, 0],
+                vec![4, 0, 0, 0],
+                vec![0, 0, 0, 0],
+            ]
         })
     );
     assert_eq!(
@@ -94,6 +106,12 @@ fn push() {
             spawned_row: 0,
             spawned_col: 0,
             spawned_value: 2,
+            merged: vec![
+                vec![0, 0, 0, 0],
+                vec![0, 0, 0, 0],
+                vec![0, 0, 0, 0],
+                vec![4, 0, 0, 0],
+            ]
         })
     );
     assert_eq!(
@@ -120,6 +138,12 @@ fn push() {
             spawned_row: 1,
             spawned_col: 0,
             spawned_value: 2,
+            merged: vec![
+                vec![0, 0, 0, 0],
+                vec![0, 0, 0, 0],
+                vec![0, 0, 0, 0],
+                vec![8, 0, 0, 0],
+            ]
         })
     );
     assert_eq!(
@@ -146,6 +170,12 @@ fn push() {
             spawned_row: 0,
             spawned_col: 2,
             spawned_value: 2,
+            merged: vec![
+                vec![0, 0, 0, 0],
+                vec![0, 0, 0, 0],
+                vec![0, 0, 0, 0],
+                vec![0, 0, 0, 0],
+            ]
         })
     );
     assert_eq!(
@@ -172,6 +202,12 @@ fn push() {
             spawned_row: 2,
             spawned_col: 2,
             spawned_value: 2,
+            merged: vec![
+                vec![0, 0, 0, 4],
+                vec![0, 0, 0, 0],
+                vec![0, 0, 0, 0],
+                vec![0, 0, 0, 0],
+            ]
         })
     );
     assert_eq!(
@@ -211,6 +247,12 @@ fn push() {
             spawned_row: 2,
             spawned_col: 2,
             spawned_value: 2,
+            merged: vec![
+                vec![0, 0, 0, 4],
+                vec![0, 0, 0, 0],
+                vec![0, 0, 0, 0],
+                vec![0, 0, 0, 0],
+            ]
         })
     );
     assert_eq!(
@@ -276,6 +318,12 @@ fn push() {
             spawned_row: 0,
             spawned_col: 2,
             spawned_value: 2,
+            merged: vec![
+                vec![4, 0, 0, 0],
+                vec![0, 0, 0, 0],
+                vec![0, 0, 0, 0],
+                vec![0, 0, 0, 0],
+            ]
         })
     );
     assert_eq!(
@@ -341,6 +389,12 @@ fn push() {
             spawned_row: 0,
             spawned_col: 2,
             spawned_value: 2,
+            merged: vec![
+                vec![0, 0, 0, 0],
+                vec![0, 0, 0, 0],
+                vec![4, 0, 0, 0],
+                vec![0, 0, 0, 0],
+            ]
         })
     );
     assert_eq!(
@@ -367,6 +421,12 @@ fn push() {
             spawned_row: 2,
             spawned_col: 2,
             spawned_value: 2,
+            merged: vec![
+                vec![0, 0, 0, 0],
+                vec![0, 0, 0, 0],
+                vec![0, 0, 0, 0],
+                vec![0, 0, 0, 0],
+            ]
         })
     );
     assert_eq!(
