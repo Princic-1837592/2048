@@ -4,6 +4,9 @@ use rand::{rngs::StdRng, RngCore, SeedableRng};
 #[cfg(target_family = "wasm")]
 use serde::Serialize;
 
+use crate::pair::Pair;
+
+mod pair;
 #[cfg(test)]
 mod tests;
 
@@ -54,8 +57,7 @@ impl TryFrom<char> for Direction {
 #[cfg_attr(test, derive(Debug, Eq, PartialEq))]
 #[cfg_attr(target_family = "wasm", derive(Serialize))]
 pub struct PushResult {
-    pub movements: Vec<Vec<u8>>,
-    pub merged: Vec<Vec<u32>>,
+    pub transitions: Vec<Vec<Pair>>,
     pub spawned_row: usize,
     pub spawned_col: usize,
     pub spawned_value: u32,
@@ -93,48 +95,42 @@ impl Game {
 
     pub fn push(&mut self, direction: Direction) -> Option<PushResult> {
         let before = History::new(self, self.rng.clone(), direction);
+        let mut transitions = vec![vec![Pair::default(); self.width()]; self.height()];
+        for (i, row) in self.board.iter_mut().enumerate() {
+            for (j, cell) in row.iter_mut().enumerate() {
+                if *cell != 0 {
+                    transitions[i][j].push((i, j));
+                }
+            }
+        }
         match direction {
             Direction::U => {
-                self.reverse();
-                self.transpose();
+                self.reverse(&mut transitions);
+                self.transpose(&mut transitions);
             }
-            Direction::R => self.reverse(),
+            Direction::R => self.reverse(&mut transitions),
             Direction::L => {}
             Direction::D => {
-                self.transpose();
-                self.reverse();
+                self.transpose(&mut transitions);
+                self.reverse(&mut transitions);
             }
         };
         let mut moved = false;
-        let (this_moved, first_move) = self.move_left();
-        moved |= this_moved;
-        let (this_moved, merge_move, mut merged) = self.merge_left();
-        moved |= this_moved;
-        let (this_moved, second_move) = self.move_left();
-        moved |= this_moved;
-        let mut movements = Self::merge_movements(first_move, merge_move, second_move);
+        moved |= self.move_left(&mut transitions);
+        moved |= self.merge_left(&mut transitions);
+        moved |= self.move_left(&mut transitions);
         match direction {
             Direction::U => {
-                self.transpose();
-                transpose(&mut movements);
-                transpose(&mut merged);
-                self.reverse();
-                reverse(&mut movements);
-                reverse(&mut merged);
+                self.transpose(&mut transitions);
+                self.reverse(&mut transitions);
             }
             Direction::R => {
-                self.reverse();
-                reverse(&mut movements);
-                reverse(&mut merged);
+                self.reverse(&mut transitions);
             }
             Direction::L => {}
             Direction::D => {
-                self.reverse();
-                reverse(&mut movements);
-                reverse(&mut merged);
-                self.transpose();
-                transpose(&mut movements);
-                transpose(&mut merged);
+                self.reverse(&mut transitions);
+                self.transpose(&mut transitions);
             }
         };
         if moved {
@@ -143,37 +139,35 @@ impl Game {
                 self.add_to_history(before);
             }
             Some(PushResult {
-                movements,
+                transitions,
                 spawned_row,
                 spawned_col,
                 spawned_value,
-                merged,
             })
         } else {
             None
         }
     }
 
-    fn move_left(&mut self) -> (bool, Vec<Vec<usize>>) {
-        let mut result = vec![vec![0; self.width()]; self.height()];
+    fn move_left(&mut self, transitions: &mut [Vec<Pair>]) -> bool {
         let mut moved = false;
         for (i, row) in self.board.iter_mut().enumerate() {
             let mut first_empty = row.iter().position(|&v| v == 0).unwrap_or(row.len());
             for j in first_empty + 1..row.len() {
                 if row[j] != 0 {
                     row.swap(first_empty, j);
-                    result[i][j] = j - first_empty;
+                    while let Some(value) = transitions[i][j].pop() {
+                        transitions[i][first_empty].push(value);
+                    }
                     first_empty += 1;
                     moved = true;
                 }
             }
         }
-        (moved, result)
+        moved
     }
 
-    fn merge_left(&mut self) -> (bool, Vec<Vec<usize>>, Vec<Vec<u32>>) {
-        let mut result = vec![vec![0; self.width()]; self.height()];
-        let mut merged = vec![vec![0; self.width()]; self.height()];
+    fn merge_left(&mut self, transitions: &mut [Vec<Pair>]) -> bool {
         let mut moved = false;
         for (i, row) in self.board.iter_mut().enumerate() {
             for j in 0..row.len() - 1 {
@@ -181,13 +175,14 @@ impl Game {
                     row[j] *= 2;
                     self.score += row[j];
                     row[j + 1] = 0;
-                    result[i][j + 1] = 1;
-                    merged[i][j] = row[j];
+                    while let Some(value) = transitions[i][j + 1].pop() {
+                        transitions[i][j].push(value);
+                    }
                     moved = true;
                 }
             }
         }
-        (moved, result, merged)
+        moved
     }
 
     fn add_to_history(&mut self, state: History) {
@@ -209,17 +204,33 @@ impl Game {
         }
     }
 
-    fn reverse(&mut self) {
-        reverse(&mut self.board)
+    fn reverse(&mut self, transitions: &mut [Vec<Pair>]) {
+        reverse(&mut self.board);
+        reverse(transitions);
+        for row in transitions.iter_mut() {
+            row.iter_mut().for_each(|p| {
+                p.first = p.first.map(|(i, j)| (i, self.width() - 1 - j));
+                p.second = p.second.map(|(i, j)| (i, self.width() - 1 - j));
+            })
+        }
     }
 
-    fn transpose(&mut self) {
+    fn transpose(&mut self, #[allow(clippy::ptr_arg)] transitions: &mut Vec<Vec<Pair>>) {
         for i in 0..self.board.len() {
             for j in 0..self.board[0].len() {
                 self.transpose[j][i] = self.board[i][j];
             }
         }
         swap(&mut self.board, &mut self.transpose);
+        let old = transitions.clone();
+        for (i, row) in old.iter().enumerate() {
+            for (j, pair) in row.iter().enumerate() {
+                transitions[j][i] = Pair {
+                    first: pair.first.map(|(i, j)| (j, i)),
+                    second: pair.second.map(|(i, j)| (j, i)),
+                }
+            }
+        }
     }
 
     fn spawn(&mut self) -> (usize, usize, u32) {
@@ -265,42 +276,6 @@ impl Game {
     pub fn get(&self, i: usize, j: usize) -> u32 {
         self.board[i][j]
     }
-
-    fn merge_movements(
-        mut first_move: Vec<Vec<usize>>,
-        mut merge: Vec<Vec<usize>>,
-        mut second_move: Vec<Vec<usize>>,
-    ) -> Vec<Vec<u8>> {
-        let mut result = vec![vec![0; first_move[0].len()]; first_move.len()];
-        for (i, row) in result.iter_mut().enumerate() {
-            for (mut j, cell) in row.iter_mut().enumerate().rev() {
-                let mut total_steps = 0;
-                let steps = first_move[i][j];
-                total_steps += steps;
-                first_move[i][j] = 0;
-                j -= steps;
-                let steps = merge[i][j];
-                total_steps += steps;
-                merge[i][j] = 0;
-                j -= steps;
-                let steps = second_move[i][j];
-                total_steps += steps;
-                second_move[i][j] = 0;
-                *cell = total_steps as u8;
-            }
-        }
-        result
-    }
-}
-
-fn transpose<T: Copy>(matrix: &mut Vec<Vec<T>>) {
-    let mut result = vec![vec![matrix[0][0]; matrix.len()]; matrix[0].len()];
-    for (i, row) in matrix.iter().enumerate() {
-        for (j, value) in row.iter().enumerate() {
-            result[j][i] = *value;
-        }
-    }
-    swap(matrix, &mut result);
 }
 
 fn reverse<T>(matrix: &mut [Vec<T>]) {
