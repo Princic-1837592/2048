@@ -11,9 +11,9 @@ pub const MAX_SIZE: usize = 10;
 
 #[derive(Clone, Debug)]
 pub struct Game {
-    score: usize,
-    board: Vec<Vec<usize>>,
-    transpose: Vec<Vec<usize>>,
+    score: u32,
+    board: Vec<Vec<u32>>,
+    transpose: Vec<Vec<u32>>,
     history: VecDeque<History>,
     max_history: usize,
     rng: StdRng,
@@ -21,8 +21,8 @@ pub struct Game {
 
 #[derive(Clone, Debug)]
 struct History {
-    score: usize,
-    board: Vec<Vec<usize>>,
+    score: u32,
+    board: Vec<Vec<u32>>,
     rng: StdRng,
     direction: Direction,
 }
@@ -210,7 +210,7 @@ impl Game {
         self.board[i][j] = value;
     }
 
-    pub fn score(&self) -> usize {
+    pub fn score(&self) -> u32 {
         self.score
     }
 
@@ -226,7 +226,7 @@ impl Game {
         self.max_history
     }
 
-    pub fn board(&self) -> &Vec<Vec<usize>> {
+    pub fn board(&self) -> &Vec<Vec<u32>> {
         &self.board
     }
 
@@ -234,7 +234,7 @@ impl Game {
         self.history.iter().rev().map(|h| h.direction).collect()
     }
 
-    pub fn get(&self, i: usize, j: usize) -> usize {
+    pub fn get(&self, i: usize, j: usize) -> u32 {
         self.board[i][j]
     }
 
@@ -245,9 +245,6 @@ impl Game {
     ) -> Vec<Vec<u8>> {
         let mut result = vec![vec![0; first_move[0].len()]; first_move.len()];
         for (i, row) in result.iter_mut().enumerate() {
-            if i == 2 {
-                dbg!();
-            }
             for (mut j, cell) in row.iter_mut().enumerate().rev() {
                 let mut total_steps = 0;
                 let steps = first_move[i][j];
