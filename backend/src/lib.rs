@@ -49,6 +49,14 @@ impl TryFrom<char> for Direction {
     }
 }
 
+#[cfg_attr(test, derive(Debug, Eq, PartialEq))]
+pub struct PushResult {
+    pub movements: Vec<Vec<u8>>,
+    pub spawned_row: usize,
+    pub spawned_col: usize,
+    pub spawned_value: u32,
+}
+
 impl Game {
     /// Create a new game with a random seed
     pub fn new(height: usize, width: usize, max_history: usize) -> Option<Self> {
@@ -79,7 +87,7 @@ impl Game {
         }
     }
 
-    pub fn push(&mut self, direction: Direction) -> Option<Vec<Vec<u8>>> {
+    pub fn push(&mut self, direction: Direction) -> Option<PushResult> {
         let before = History::new(self, self.rng.clone(), direction);
         match direction {
             Direction::U => {
@@ -100,33 +108,40 @@ impl Game {
         moved |= this_moved;
         let (this_moved, second_move) = self.move_left();
         moved |= this_moved;
-        let mut steps = Self::merge_steps(first_move, merge, second_move);
+        let mut movements = Self::merge_movements(first_move, merge, second_move);
         match direction {
             Direction::U => {
                 self.transpose();
-                transpose(&mut steps);
+                transpose(&mut movements);
                 self.reverse();
-                reverse(&mut steps);
+                reverse(&mut movements);
             }
             Direction::R => {
                 self.reverse();
-                reverse(&mut steps);
+                reverse(&mut movements);
             }
             Direction::L => {}
             Direction::D => {
                 self.reverse();
-                reverse(&mut steps);
+                reverse(&mut movements);
                 self.transpose();
-                transpose(&mut steps);
+                transpose(&mut movements);
             }
         };
         if moved {
-            self.spawn();
+            let (spawned_row, spawned_col, spawned_value) = self.spawn();
             if self.max_history > 0 {
                 self.add_to_history(before);
             }
+            Some(PushResult {
+                movements,
+                spawned_row,
+                spawned_col,
+                spawned_value,
+            })
+        } else {
+            None
         }
-        moved.then_some(steps)
     }
 
     fn move_left(&mut self) -> (bool, Vec<Vec<usize>>) {
@@ -195,7 +210,7 @@ impl Game {
         swap(&mut self.board, &mut self.transpose);
     }
 
-    fn spawn(&mut self) {
+    fn spawn(&mut self) -> (usize, usize, u32) {
         let (mut i, mut j) = (
             self.rng.next_u32() as usize % self.board.len(),
             self.rng.next_u32() as usize % self.board[0].len(),
@@ -208,6 +223,7 @@ impl Game {
         }
         let value = if self.rng.next_u32() % 10 == 0 { 4 } else { 2 };
         self.board[i][j] = value;
+        (i, j, value)
     }
 
     pub fn score(&self) -> u32 {
@@ -238,7 +254,7 @@ impl Game {
         self.board[i][j]
     }
 
-    fn merge_steps(
+    fn merge_movements(
         mut first_move: Vec<Vec<usize>>,
         mut merge: Vec<Vec<usize>>,
         mut second_move: Vec<Vec<usize>>,
