@@ -11,3 +11,5 @@ crate-type = ["cdylib"]
 backend = { path = "../backend" }
 wasm-bindgen = "0.2.80"
 itertools = "0.11.0"
+serde = { version = "1.0.189", features = ["derive"] }
+serde_json = { version = "1.0.107" }
