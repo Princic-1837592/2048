@@ -69,16 +69,84 @@
     height: 107px;
     line-height: 107px;
     border-radius: 3px;
-    /*border: 1px solid green;*/
     text-align: center;
     font-weight: bold;
     z-index: 10;
-    font-size: 55px;
     animation: appear 200ms ease 100ms;
     animation-fill-mode: backwards;
+    font-family: "Clear Sans", "Helvetica Neue", Arial, sans-serif;
 }
 
 .number-2 {
+    color: #776e65;
+    background-color: #eee4da;
+    font-size: 55px;
+}
+
+.number-4 {
+    color: #776e65;
+    background-color: #eee1c9;
+    font-size: 55px;
+}
+
+.number-8 {
+    color: #f9f6f2;
+    background: #f3b27a;
+    font-size: 55px;
+}
+
+.number-16 {
+    color: #f9f6f2;
+    background: #f69664;
+    font-size: 55px;
+}
+
+.number-32 {
+    color: #f9f6f2;
+    background: #f77c5f;
+    font-size: 55px;
+}
+
+.number-64 {
+    color: #f9f6f2;
+    background: #f75f3b;
+    font-size: 55px;
+}
+
+.number-128 {
+    color: #f9f6f2;
+    background: #edd073;
+    font-size: 45px;
+}
+
+.number-256 {
+    color: #f9f6f2;
+    background: #edcc62;
+    font-size: 45px;
+}
+
+.number-512 {
+    color: #f9f6f2;
+    background: #edc950;
+    font-size: 45px;
+}
+
+.number-1024 {
+    color: #f9f6f2;
+    background: #edc53f;
+    font-size: 35px;
+}
+
+.number-2048 {
+    color: #f9f6f2;
+    background: #edc22e;
+    font-size: 35px;
+}
+
+.number-other {
+    color: #f9f6f2;
+    background: #3c3a33;
+    font-size: 35px;
 }
 
 .position-0-0 {
