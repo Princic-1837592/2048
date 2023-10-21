@@ -39,11 +39,11 @@ impl TryFrom<char> for Direction {
     type Error = ();
 
     fn try_from(value: char) -> Result<Self, Self::Error> {
-        match value {
-            'u' => Ok(Self::U),
-            'r' => Ok(Self::R),
-            'l' => Ok(Self::L),
-            'd' => Ok(Self::D),
+        match value.to_ascii_uppercase() {
+            'U' => Ok(Self::U),
+            'R' => Ok(Self::R),
+            'L' => Ok(Self::L),
+            'D' => Ok(Self::D),
             _ => Err(()),
         }
     }
