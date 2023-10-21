@@ -1,6 +1,8 @@
 use std::{collections::VecDeque, mem::swap};
 
 use rand::{rngs::StdRng, RngCore, SeedableRng};
+#[cfg(target_family = "wasm")]
+use serde::Serialize;
 
 #[cfg(test)]
 mod tests;
@@ -50,6 +52,7 @@ impl TryFrom<char> for Direction {
 }
 
 #[cfg_attr(test, derive(Debug, Eq, PartialEq))]
+#[cfg_attr(target_family = "wasm", derive(Serialize))]
 pub struct PushResult {
     pub movements: Vec<Vec<u8>>,
     pub spawned_row: usize,
