@@ -1,4 +1,4 @@
-use crate::{Direction, Game};
+use crate::{Direction, Game, PushResult};
 
 #[test]
 fn new() {
@@ -32,12 +32,17 @@ fn push() {
 
     assert_eq!(
         game.push(Direction::L),
-        Some(vec![
-            vec![0, 0, 0, 0],
-            vec![0, 0, 0, 0],
-            vec![0, 0, 0, 3],
-            vec![0, 1, 0, 0],
-        ])
+        Some(PushResult {
+            movements: vec![
+                vec![0, 0, 0, 0],
+                vec![0, 0, 0, 0],
+                vec![0, 0, 0, 3],
+                vec![0, 1, 0, 0],
+            ],
+            spawned_row: 2,
+            spawned_col: 2,
+            spawned_value: 2,
+        })
     );
     assert_eq!(
         game.board,
@@ -53,12 +58,17 @@ fn push() {
 
     assert_eq!(
         game.push(Direction::L),
-        Some(vec![
-            vec![0, 0, 0, 0],
-            vec![0, 0, 0, 0],
-            vec![0, 0, 2, 0],
-            vec![0, 0, 0, 0],
-        ])
+        Some(PushResult {
+            movements: vec![
+                vec![0, 0, 0, 0],
+                vec![0, 0, 0, 0],
+                vec![0, 0, 2, 0],
+                vec![0, 0, 0, 0],
+            ],
+            spawned_row: 3,
+            spawned_col: 1,
+            spawned_value: 2,
+        })
     );
     assert_eq!(
         game.board,
@@ -74,12 +84,17 @@ fn push() {
 
     assert_eq!(
         game.push(Direction::L),
-        Some(vec![
-            vec![0, 0, 0, 0],
-            vec![0, 0, 0, 0],
-            vec![0, 0, 0, 0],
-            vec![0, 1, 0, 0],
-        ])
+        Some(PushResult {
+            movements: vec![
+                vec![0, 0, 0, 0],
+                vec![0, 0, 0, 0],
+                vec![0, 0, 0, 0],
+                vec![0, 1, 0, 0],
+            ],
+            spawned_row: 0,
+            spawned_col: 0,
+            spawned_value: 2,
+        })
     );
     assert_eq!(
         game.board,
@@ -95,12 +110,17 @@ fn push() {
 
     assert_eq!(
         game.push(Direction::D),
-        Some(vec![
-            vec![2, 0, 0, 0],
-            vec![0, 0, 0, 0],
-            vec![1, 0, 0, 0],
-            vec![0, 0, 0, 0],
-        ])
+        Some(PushResult {
+            movements: vec![
+                vec![2, 0, 0, 0],
+                vec![0, 0, 0, 0],
+                vec![1, 0, 0, 0],
+                vec![0, 0, 0, 0],
+            ],
+            spawned_row: 1,
+            spawned_col: 0,
+            spawned_value: 2,
+        })
     );
     assert_eq!(
         game.board,
@@ -116,12 +136,17 @@ fn push() {
 
     assert_eq!(
         game.push(Direction::R),
-        Some(vec![
-            vec![0, 0, 0, 0],
-            vec![3, 0, 0, 0],
-            vec![3, 0, 0, 0],
-            vec![3, 0, 0, 0],
-        ])
+        Some(PushResult {
+            movements: vec![
+                vec![0, 0, 0, 0],
+                vec![3, 0, 0, 0],
+                vec![3, 0, 0, 0],
+                vec![3, 0, 0, 0],
+            ],
+            spawned_row: 0,
+            spawned_col: 2,
+            spawned_value: 2,
+        })
     );
     assert_eq!(
         game.board,
@@ -137,12 +162,17 @@ fn push() {
 
     assert_eq!(
         game.push(Direction::U),
-        Some(vec![
-            vec![0, 0, 0, 0],
-            vec![0, 0, 0, 1],
-            vec![0, 0, 0, 2],
-            vec![0, 0, 0, 2],
-        ])
+        Some(PushResult {
+            movements: vec![
+                vec![0, 0, 0, 0],
+                vec![0, 0, 0, 1],
+                vec![0, 0, 0, 2],
+                vec![0, 0, 0, 2],
+            ],
+            spawned_row: 2,
+            spawned_col: 2,
+            spawned_value: 2,
+        })
     );
     assert_eq!(
         game.board,
@@ -171,12 +201,17 @@ fn push() {
 
     assert_eq!(
         game.push(Direction::U),
-        Some(vec![
-            vec![0, 0, 0, 0],
-            vec![0, 0, 0, 1],
-            vec![0, 0, 0, 2],
-            vec![0, 0, 0, 2],
-        ])
+        Some(PushResult {
+            movements: vec![
+                vec![0, 0, 0, 0],
+                vec![0, 0, 0, 1],
+                vec![0, 0, 0, 2],
+                vec![0, 0, 0, 2],
+            ],
+            spawned_row: 2,
+            spawned_col: 2,
+            spawned_value: 2,
+        })
     );
     assert_eq!(
         game.board,
@@ -231,12 +266,17 @@ fn push() {
 
     assert_eq!(
         game.push(Direction::U),
-        Some(vec![
-            vec![0, 0, 0, 0],
-            vec![1, 0, 0, 0],
-            vec![2, 0, 0, 0],
-            vec![2, 0, 0, 0],
-        ])
+        Some(PushResult {
+            movements: vec![
+                vec![0, 0, 0, 0],
+                vec![1, 0, 0, 0],
+                vec![2, 0, 0, 0],
+                vec![2, 0, 0, 0],
+            ],
+            spawned_row: 0,
+            spawned_col: 2,
+            spawned_value: 2,
+        })
     );
     assert_eq!(
         game.board,
@@ -291,12 +331,17 @@ fn push() {
 
     assert_eq!(
         game.push(Direction::D),
-        Some(vec![
-            vec![0, 0, 0, 0],
-            vec![1, 0, 0, 0],
-            vec![0, 0, 0, 0],
-            vec![0, 0, 0, 0],
-        ])
+        Some(PushResult {
+            movements: vec![
+                vec![0, 0, 0, 0],
+                vec![1, 0, 0, 0],
+                vec![0, 0, 0, 0],
+                vec![0, 0, 0, 0],
+            ],
+            spawned_row: 0,
+            spawned_col: 2,
+            spawned_value: 2,
+        })
     );
     assert_eq!(
         game.board,
@@ -312,12 +357,17 @@ fn push() {
 
     assert_eq!(
         game.push(Direction::D),
-        Some(vec![
-            vec![0, 0, 3, 0],
-            vec![0, 0, 0, 0],
-            vec![0, 0, 0, 0],
-            vec![0, 0, 0, 0],
-        ])
+        Some(PushResult {
+            movements: vec![
+                vec![0, 0, 3, 0],
+                vec![0, 0, 0, 0],
+                vec![0, 0, 0, 0],
+                vec![0, 0, 0, 0],
+            ],
+            spawned_row: 2,
+            spawned_col: 2,
+            spawned_value: 2,
+        })
     );
     assert_eq!(
         game.board,
