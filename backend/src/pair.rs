@@ -1,6 +1,9 @@
 #[cfg(test)]
 use std::fmt::Debug;
 
+#[cfg(target_family = "wasm")]
+use serde::{Serialize, Serializer};
+
 type Coord = (usize, usize);
 
 #[derive(Copy, Clone, Default)]
@@ -24,6 +27,31 @@ impl Pair {
             self.second.take()
         } else {
             self.first.take()
+        }
+    }
+
+    pub(crate) fn clear(&mut self) {
+        self.second.take();
+        self.first.take();
+    }
+
+    pub(crate) fn len(&self) -> usize {
+        match (self.first.is_some(), self.second.is_some()) {
+            (true, true) => 2,
+            (true, false) => 1,
+            (false, false) => 0,
+            _ => {
+                unreachable!()
+            }
+        }
+    }
+}
+
+impl From<()> for Pair {
+    fn from(_: ()) -> Self {
+        Self {
+            first: None,
+            second: None,
         }
     }
 }
@@ -63,5 +91,22 @@ impl Debug for Pair {
                 write!(f, "()")
             }
         }
+    }
+}
+
+#[cfg(target_family = "wasm")]
+impl Serialize for Pair {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let mut array = vec![];
+        if let Some(value) = self.first {
+            array.push(value);
+        }
+        if let Some(value) = self.second {
+            array.push(value);
+        }
+        array.serialize(serializer)
     }
 }

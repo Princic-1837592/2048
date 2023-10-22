@@ -133,6 +133,13 @@ impl Game {
                 self.transpose(&mut transitions);
             }
         };
+        for (i, row) in transitions.iter_mut().enumerate() {
+            for (j, pair) in row.iter_mut().enumerate() {
+                if pair.len() == 1 && pair.first.unwrap() == (i, j) {
+                    pair.pop();
+                }
+            }
+        }
         if moved {
             let (spawned_row, spawned_col, spawned_value) = self.spawn();
             if self.max_history > 0 {
