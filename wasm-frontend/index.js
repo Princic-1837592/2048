@@ -1,11 +1,23 @@
-import init, {
-    newGame as beNewGame, push, undo, getState, getScore
-} from "./pkg/wasm_frontend.js";
+import init, {getScore, getState, push} from "./pkg/wasm_frontend.js";
 
 init().then(initialize_grid);
 
+function new_tile(i, j, value, extra_class) {
+    const outer = document.createElement("div");
+    outer.classList.add("tile");
+    outer.classList.add(`tile-${value}`);
+    outer.classList.add(`position-${i}-${j}`);
+    if (extra_class) {
+        outer.classList.add(extra_class);
+    }
+    const inner = document.createElement("div");
+    inner.classList.add("tile-inner");
+    inner.textContent = `${value}`;
+    outer.appendChild(inner);
+    return outer;
+}
+
 function initialize_grid() {
-    document.getElementById("score").textContent = getScore().toString();
     const state = JSON.parse(getState());
     let numbers = document.getElementById("numbers");
     numbers.innerHTML = "";
@@ -14,90 +26,82 @@ function initialize_grid() {
             if (state[i][j] === 0) {
                 continue;
             }
-            let child = document.createElement("div");
-            child.classList.add("number");
-            child.classList.add(`number-${state[i][j]}`);
-            child.classList.add(`position-${i}-${j}`);
-            child.textContent = state[i][j];
-            numbers.appendChild(child);
+            const tile = new_tile(i, j, state[i][j], "tile-new");
+            numbers.appendChild(tile);
         }
     }
 }
 
-function render(push_result, hcoeff, vcoeff) {
-    const height = push_result.movements.length;
-    const width = push_result.movements[0].length;
-    document.querySelectorAll(`#numbers>.position-new`).forEach(e => e.classList.remove("position-new"));
-    for (let i = 0; i < height; i++) {
-        for (let j = 0; j < width; j++) {
-            if (push_result.movements[i][j] === 0) {
-                continue;
-            }
-            const child = document.querySelector(`#numbers>.position-${i}-${j}`);
-            if(child === null) {
-                continue;
-            }
-            child.classList.remove(`position-${i}-${j}`);
-            child.classList.add(`position-${i + push_result.movements[i][j] * vcoeff}-${j + push_result.movements[i][j] * hcoeff}`);
-        }
+class ToMove {
+    constructor(child, oi, oj, ni, nj) {
+        this.child = child;
+        this.oi = oi;
+        this.oj = oj;
+        this.ni = ni;
+        this.nj = nj;
     }
+}
+
+function render(push_result) {
+    const height = push_result.transitions.length;
+    const width = push_result.transitions[0].length;
+    document.querySelectorAll(`.tile.position-new`).forEach(e => e.classList.remove("position-new"));
+    document.querySelectorAll(`.tile.tile-merged`).forEach(e => e.classList.remove("tile-merged"));
+    document.querySelectorAll(`.tile.to-remove`).forEach(e => e.remove());
     const numbers = document.getElementById("numbers");
-    let child = document.createElement("div");
-    child.classList.add("number");
-    child.classList.add(`number-${push_result.spawned_value}`);
-    child.classList.add(`position-${push_result.spawned_row}-${push_result.spawned_col}`);
-    child.classList.add(`position-new`);
-    child.textContent = push_result.spawned_value;
-    numbers.appendChild(child);
+    const to_move = [];
     for (let i = 0; i < height; i++) {
         for (let j = 0; j < width; j++) {
-            if (push_result.merged[i][j] === 0) {
-                continue;
+            for (const [oi, oj] of push_result.transitions[i][j]) {
+                const child = document.querySelector(`.tile.position-${oi}-${oj}`);
+                to_move.push(new ToMove(child, oi, oj, i, j));
             }
-            console.log(i, j);
-            let [first,second] = document.querySelectorAll(`#numbers>.position-${i}-${j}`);
-            let child = document.createElement("div");
-            child.classList.add("number");
-            child.classList.add(`number-${push_result.merged[i][j]}`);
-            child.classList.add(`position-${i}-${j}`);
-            child.textContent = push_result.merged[i][j];
-            numbers.appendChild(child);
-            first.remove();
-            second.remove();
         }
     }
-    console.log(JSON.parse(getState()));
+    for (const move of to_move) {
+        move.child.classList.remove(`position-${move.oi}-${move.oj}`);
+        move.child.classList.add(`position-${move.ni}-${move.nj}`);
+    }
+    for (let i = 0; i < height; i++) {
+        for (let j = 0; j < width; j++) {
+            if (push_result.transitions[i][j].length === 2) {
+                const old_children = document.querySelectorAll(`.tile.position-${i}-${j}`);
+                const new_value = parseInt(old_children[0].querySelector(".tile-inner").textContent) * 2;
+                const merged = new_tile(i, j, new_value, "tile-merged");
+                numbers.appendChild(merged);
+                old_children.forEach(e => e.classList.add("to-remove"));
+            }
+        }
+    }
+    const spawned = new_tile(
+        push_result.spawned_row,
+        push_result.spawned_col,
+        push_result.spawned_value,
+        "tile-new",
+    )
+    numbers.appendChild(spawned);
 }
 
 function keydown_event(e) {
     let direction = '';
-    let hcoeff, vcoeff;
     switch (e.key) {
         case 'ArrowUp':
             direction = 'U';
-            hcoeff = 0;
-            vcoeff = -1;
             break;
         case 'ArrowDown':
             direction = 'D';
-            hcoeff = 0;
-            vcoeff = 1;
             break;
         case 'ArrowLeft':
             direction = 'L';
-            hcoeff = -1;
-            vcoeff = 0;
             break;
         case 'ArrowRight':
             direction = 'R';
-            hcoeff = 1;
-            vcoeff = 0;
             break;
     }
     if (direction !== '') {
-        let result = push(direction);
-        if (result !== undefined) {
-            render(JSON.parse(result), hcoeff, vcoeff);
+        let result = JSON.parse(push(direction));
+        if (result !== null) {
+            render(result);
         }
     }
 }

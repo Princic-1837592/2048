@@ -5,7 +5,7 @@ use serde_json::to_string;
 use wasm_bindgen::prelude::wasm_bindgen;
 
 thread_local! {
-    static GAME: RefCell<Game> = RefCell::new(Game::default());
+static GAME: RefCell<Game> = RefCell::new(Game::default());
 }
 
 #[wasm_bindgen(js_name = newGame)]
