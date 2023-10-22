@@ -30,11 +30,6 @@ impl Pair {
         }
     }
 
-    pub(crate) fn clear(&mut self) {
-        self.second.take();
-        self.first.take();
-    }
-
     pub(crate) fn len(&self) -> usize {
         match (self.first.is_some(), self.second.is_some()) {
             (true, true) => 2,
