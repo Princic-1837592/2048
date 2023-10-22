@@ -42,6 +42,7 @@ fn push() {
             spawned_row: 2,
             spawned_col: 2,
             spawned_value: 2,
+            new_score: 0,
         })
     );
     assert_eq!(
@@ -68,6 +69,7 @@ fn push() {
             spawned_row: 3,
             spawned_col: 1,
             spawned_value: 2,
+            new_score: 4,
         })
     );
     assert_eq!(
@@ -107,6 +109,7 @@ fn push() {
             spawned_row: 3,
             spawned_col: 1,
             spawned_value: 2,
+            new_score: 4,
         })
     );
     assert_eq!(
@@ -133,6 +136,7 @@ fn push() {
             spawned_row: 0,
             spawned_col: 0,
             spawned_value: 2,
+            new_score: 4 + 4,
         })
     );
     assert_eq!(
@@ -159,6 +163,7 @@ fn push() {
             spawned_row: 1,
             spawned_col: 0,
             spawned_value: 2,
+            new_score: 4 + 4 + 8,
         })
     );
     assert_eq!(
@@ -185,6 +190,7 @@ fn push() {
             spawned_row: 0,
             spawned_col: 2,
             spawned_value: 2,
+            new_score: 4 + 4 + 8,
         })
     );
     assert_eq!(
@@ -211,6 +217,7 @@ fn push() {
             spawned_row: 2,
             spawned_col: 2,
             spawned_value: 2,
+            new_score: 4 + 4 + 8 + 4,
         })
     );
     assert_eq!(
@@ -250,6 +257,7 @@ fn push() {
             spawned_row: 2,
             spawned_col: 2,
             spawned_value: 2,
+            new_score: 4 + 4 + 8 + 4,
         })
     );
     assert_eq!(
@@ -315,6 +323,7 @@ fn push() {
             spawned_row: 0,
             spawned_col: 2,
             spawned_value: 2,
+            new_score: 4 + 4 + 8 + 4,
         })
     );
     assert_eq!(
@@ -380,6 +389,7 @@ fn push() {
             spawned_row: 0,
             spawned_col: 2,
             spawned_value: 2,
+            new_score: 4 + 4 + 8 + 4,
         })
     );
     assert_eq!(
@@ -406,6 +416,7 @@ fn push() {
             spawned_row: 2,
             spawned_col: 2,
             spawned_value: 2,
+            new_score: 4 + 4 + 8 + 4,
         })
     );
     assert_eq!(
