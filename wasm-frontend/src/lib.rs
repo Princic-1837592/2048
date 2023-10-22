@@ -43,7 +43,7 @@ pub fn get_state() -> String {
 }
 
 #[wasm_bindgen(js_name = get_score)]
-pub fn get_score() -> u32 {
+pub fn get_score() -> u64 {
     GAME.with(|game| {
         return game.borrow().score();
     })
