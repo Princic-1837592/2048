@@ -1,7 +1,7 @@
 use std::cell::RefCell;
 
 use backend::Game;
-use serde_json::to_string;
+use serde_json::{to_string, Number, Value};
 use wasm_bindgen::prelude::wasm_bindgen;
 
 thread_local! {
@@ -9,15 +9,28 @@ static GAME: RefCell<Game> = RefCell::new(Game::default());
 }
 
 #[wasm_bindgen(js_name = new_game)]
-pub fn new_game(height: usize, width: usize, max_history: usize, seed: Option<usize>) -> String {
+pub fn new_game(height: usize, width: usize, max_history: usize, seed: String) -> String {
     GAME.with(|game| {
-        *game.borrow_mut() = if let Some(seed) = seed {
-            Game::from_seed(height, width, max_history, seed as u64)
+        *game.borrow_mut() = if let Ok(seed) = seed.parse() {
+            Game::from_seed(height, width, max_history, seed)
         } else {
             Game::new(height, width, max_history)
         }
         .unwrap_or_default();
-        to_string(game.borrow().board()).unwrap_or_default()
+        let mut result = Value::default();
+        result["board"] = game
+            .borrow()
+            .board()
+            .iter()
+            .map(|row| {
+                row.iter()
+                    .map(|&cell| Value::Number(Number::from(cell)))
+                    .collect::<Vec<_>>()
+            })
+            .collect::<Vec<_>>()
+            .into();
+        result["seed"] = game.borrow().seed().to_string().into();
+        to_string(&result).unwrap_or_default()
     })
 }
 

@@ -1,4 +1,4 @@
-import init, {get_state, push, new_game} from "./pkg/wasm_frontend.js";
+import init, {push, new_game} from "./pkg/wasm_frontend.js";
 
 init().then(initialize_grid);
 
@@ -18,30 +18,21 @@ function new_tile(i, j, value, extra_class) {
 }
 
 function initialize_grid() {
-    const state = JSON.parse(get_state());
+    const seed_area = document.getElementById("seed").value;
+    const {board, seed: seed_s} = JSON.parse(new_game(4, 4, 0, seed_area));
+    const seed = BigInt(seed_s);
     let numbers = document.getElementById("numbers");
     numbers.innerHTML = "";
-    for (let i = 0; i < state.length; i++) {
-        for (let j = 0; j < state[0].length; j++) {
-            if (state[i][j] === 0) {
+    for (let i = 0; i < board.length; i++) {
+        for (let j = 0; j < board[0].length; j++) {
+            if (board[i][j] === 0) {
                 continue;
             }
-            const tile = new_tile(i, j, state[i][j], "tile-new");
+            const tile = new_tile(i, j, board[i][j], "tile-new");
             numbers.appendChild(tile);
         }
     }
-}
-
-function reset() {
-    const seed_area = document.getElementById("seed");
-    const seed = parseInt(seed_area.value);
-    if (seed !== null && !isNaN(seed)) {
-        new_game(4, 4, 0, seed);
-    } else {
-        new_game(4, 4, 0);
-        seed_area.value = "";
-    }
-    initialize_grid();
+    document.getElementById("current-seed").textContent = `${seed}`;
 }
 
 class ToMove {
@@ -119,5 +110,11 @@ function keydown_event(e) {
     }
 }
 
+function only_numbers() {
+    this.value = this.value.replace(/[^0-9]/g, '');
+}
+
 document.addEventListener('keydown', keydown_event);
-document.getElementById("new-game").onclick = reset;
+document.getElementById("new-game").onclick = initialize_grid;
+document.getElementById("seed").oninput = only_numbers;
+

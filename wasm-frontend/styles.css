@@ -24,9 +24,8 @@ html, body {
     font-weight: bold;
     border-radius: 3px;
     color: white;
-    margin-top: 8px;
     text-align: center;
-    vertical-align: bottom;
+    vertical-align: top;
     height: 50px;
 }
 
@@ -46,6 +45,7 @@ html, body {
 }
 
 #new-game {
+    vertical-align: top;
     display: inline-block;
     height: 50px;
     background: #8f7a66;
@@ -60,20 +60,33 @@ html, body {
     font-weight: bold;
 }
 
+#seed-container {
+    display: inline-block;
+    vertical-align: top;
+}
+
+#seed-container > * {
+    margin-left: 10px;
+    display: block;
+}
+
 #seed {
     resize: none;
     height: 24px;
     width: 240px;
-    margin-left: 10px;
-    vertical-align: bottom;
     border: none;
     border-radius: 3px;
     padding: 13px 0 13px 20px;
-    font-size: 20px;
+    font-size: 19px;
     background: #bbada0;
     color: white;
     font-weight: bold;
-    display: inline-block;
+}
+
+#current-seed {
+    font-size: 15px;
+    margin-top: 5px;
+    user-select: text;
 }
 
 .game-container {

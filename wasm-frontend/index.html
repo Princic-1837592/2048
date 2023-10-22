@@ -13,8 +13,11 @@
             <div id="score">0</div>
         </div>
         <button id="new-game">New Game</button>
-        <label for="seed"></label>
-        <input id="seed" placeholder="Seed" oninput="this.value=this.value.replace(/[^0-9]/g,'');" maxlength="20"/>
+        <div id="seed-container">
+            <label for="seed"></label>
+            <input id="seed" placeholder="Seed" maxlength="20"/>
+            <p id="current-seed"></p>
+        </div>
     </div>
     <div class="game-container">
         <div id="grid" class="grid-container">
