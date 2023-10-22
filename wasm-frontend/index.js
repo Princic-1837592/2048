@@ -1,4 +1,4 @@
-import init, {getScore, getState, push} from "./pkg/wasm_frontend.js";
+import init, {getState, push} from "./pkg/wasm_frontend.js";
 
 init().then(initialize_grid);
 
