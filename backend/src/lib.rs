@@ -16,9 +16,9 @@ pub const MAX_SIZE: usize = 10;
 
 #[derive(Clone, Debug)]
 pub struct Game {
-    score: u32,
-    board: Vec<Vec<u32>>,
-    transpose: Vec<Vec<u32>>,
+    score: u64,
+    board: Vec<Vec<u64>>,
+    transpose: Vec<Vec<u64>>,
     history: VecDeque<History>,
     max_history: usize,
     rng: StdRng,
@@ -26,8 +26,8 @@ pub struct Game {
 
 #[derive(Clone, Debug)]
 struct History {
-    score: u32,
-    board: Vec<Vec<u32>>,
+    score: u64,
+    board: Vec<Vec<u64>>,
     rng: StdRng,
     direction: Direction,
 }
@@ -60,8 +60,8 @@ pub struct PushResult {
     pub transitions: Vec<Vec<Pair>>,
     pub spawned_row: usize,
     pub spawned_col: usize,
-    pub spawned_value: u32,
-    pub new_score: u32,
+    pub spawned_value: u64,
+    pub new_score: u64,
 }
 
 impl Game {
@@ -242,7 +242,7 @@ impl Game {
         }
     }
 
-    fn spawn(&mut self) -> (usize, usize, u32) {
+    fn spawn(&mut self) -> (usize, usize, u64) {
         let (mut i, mut j) = (
             self.rng.next_u32() as usize % self.board.len(),
             self.rng.next_u32() as usize % self.board[0].len(),
@@ -258,7 +258,7 @@ impl Game {
         (i, j, value)
     }
 
-    pub fn score(&self) -> u32 {
+    pub fn score(&self) -> u64 {
         self.score
     }
 
@@ -274,7 +274,7 @@ impl Game {
         self.max_history
     }
 
-    pub fn board(&self) -> &Vec<Vec<u32>> {
+    pub fn board(&self) -> &Vec<Vec<u64>> {
         &self.board
     }
 
@@ -282,7 +282,7 @@ impl Game {
         self.history.iter().rev().map(|h| h.direction).collect()
     }
 
-    pub fn get(&self, i: usize, j: usize) -> u32 {
+    pub fn get(&self, i: usize, j: usize) -> u64 {
         self.board[i][j]
     }
 }
