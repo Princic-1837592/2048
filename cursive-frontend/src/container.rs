@@ -142,7 +142,7 @@ impl Container {
 
     fn draw_cell(&self, i: usize, j: usize, printer: &Printer) {
         let value = self.game.get(i, j);
-        let color = COLORS[value.checked_ilog2().unwrap_or(0) as usize];
+        let color = COLORS[value.checked_ilog2().unwrap_or(0).min(12) as usize];
         for line in 0..5 {
             let coord = (
                 j * (CELL_EXT_WIDTH - 1) + 1,
