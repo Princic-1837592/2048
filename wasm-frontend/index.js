@@ -1,4 +1,4 @@
-import init, {getState, push} from "./pkg/wasm_frontend.js";
+import init, {get_state, push, new_game} from "./pkg/wasm_frontend.js";
 
 init().then(initialize_grid);
 
@@ -18,7 +18,7 @@ function new_tile(i, j, value, extra_class) {
 }
 
 function initialize_grid() {
-    const state = JSON.parse(getState());
+    const state = JSON.parse(get_state());
     let numbers = document.getElementById("numbers");
     numbers.innerHTML = "";
     for (let i = 0; i < state.length; i++) {
@@ -30,6 +30,11 @@ function initialize_grid() {
             numbers.appendChild(tile);
         }
     }
+}
+
+function reset() {
+    new_game(4, 4, 0);
+    initialize_grid();
 }
 
 class ToMove {
@@ -80,6 +85,7 @@ function render(push_result) {
         "tile-new",
     )
     numbers.appendChild(spawned);
+    document.getElementById("score").textContent = `${push_result.new_score}`;
 }
 
 function keydown_event(e) {
@@ -107,3 +113,4 @@ function keydown_event(e) {
 }
 
 document.addEventListener('keydown', keydown_event);
+document.getElementById("new-game").onclick = reset;

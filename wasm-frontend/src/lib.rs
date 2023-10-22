@@ -8,7 +8,7 @@ thread_local! {
 static GAME: RefCell<Game> = RefCell::new(Game::default());
 }
 
-#[wasm_bindgen(js_name = newGame)]
+#[wasm_bindgen(js_name = new_game)]
 pub fn new_game(height: usize, width: usize, max_history: usize) -> String {
     GAME.with(|game| {
         *game.borrow_mut() = Game::new(height, width, max_history).unwrap_or_default();
@@ -37,12 +37,12 @@ pub fn undo() -> String {
     })
 }
 
-#[wasm_bindgen(js_name = getState)]
+#[wasm_bindgen(js_name = get_state)]
 pub fn get_state() -> String {
     GAME.with(|game| to_string(game.borrow().board()).unwrap_or_default())
 }
 
-#[wasm_bindgen(js_name = getScore)]
+#[wasm_bindgen(js_name = get_score)]
 pub fn get_score() -> u32 {
     GAME.with(|game| {
         return game.borrow().score();
