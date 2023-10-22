@@ -33,7 +33,14 @@ function initialize_grid() {
 }
 
 function reset() {
-    new_game(4, 4, 0);
+    const seed_area = document.getElementById("seed");
+    const seed = parseInt(seed_area.value);
+    if (seed !== null && !isNaN(seed)) {
+        new_game(4, 4, 0, seed);
+    } else {
+        new_game(4, 4, 0);
+        seed_area.value = "";
+    }
     initialize_grid();
 }
 

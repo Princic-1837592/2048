@@ -7,7 +7,13 @@ html, body {
     font-size: 18px;
 }
 
-#head{
+.center {
+    width: 50%;
+    margin: 0 auto;
+    padding: 10px;
+}
+
+#head {
     user-select: none;
 }
 
@@ -54,10 +60,20 @@ html, body {
     font-weight: bold;
 }
 
-.center {
-    width: 50%;
-    margin: 0 auto;
-    padding: 10px;
+#seed {
+    resize: none;
+    height: 24px;
+    width: 240px;
+    margin-left: 10px;
+    vertical-align: bottom;
+    border: none;
+    border-radius: 3px;
+    padding: 13px 0 13px 20px;
+    font-size: 20px;
+    background: #bbada0;
+    color: white;
+    font-weight: bold;
+    display: inline-block;
 }
 
 .game-container {

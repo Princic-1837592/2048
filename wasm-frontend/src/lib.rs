@@ -9,9 +9,14 @@ static GAME: RefCell<Game> = RefCell::new(Game::default());
 }
 
 #[wasm_bindgen(js_name = new_game)]
-pub fn new_game(height: usize, width: usize, max_history: usize) -> String {
+pub fn new_game(height: usize, width: usize, max_history: usize, seed: Option<usize>) -> String {
     GAME.with(|game| {
-        *game.borrow_mut() = Game::new(height, width, max_history).unwrap_or_default();
+        *game.borrow_mut() = if let Some(seed) = seed {
+            Game::from_seed(height, width, max_history, seed as u64)
+        } else {
+            Game::new(height, width, max_history)
+        }
+        .unwrap_or_default();
         to_string(game.borrow().board()).unwrap_or_default()
     })
 }
