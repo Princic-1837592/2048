@@ -22,6 +22,7 @@ pub struct Game {
     history: VecDeque<History>,
     max_history: usize,
     rng: StdRng,
+    seed: u64,
 }
 
 #[derive(Clone, Debug)]
@@ -87,6 +88,7 @@ impl Game {
                 history: VecDeque::new(),
                 max_history,
                 rng: StdRng::seed_from_u64(seed),
+                seed,
             };
             result.spawn();
             result.spawn();
@@ -284,6 +286,10 @@ impl Game {
 
     pub fn get(&self, i: usize, j: usize) -> u64 {
         self.board[i][j]
+    }
+
+    pub fn seed(&self) -> u64 {
+        self.seed
     }
 }
 
