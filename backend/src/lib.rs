@@ -61,6 +61,7 @@ pub struct PushResult {
     pub spawned_row: usize,
     pub spawned_col: usize,
     pub spawned_value: u32,
+    pub new_score: u32,
 }
 
 impl Game {
@@ -150,6 +151,7 @@ impl Game {
                 spawned_row,
                 spawned_col,
                 spawned_value,
+                new_score: self.score,
             })
         } else {
             None
