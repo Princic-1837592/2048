@@ -3,7 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <title>2048</title>
+    <link href="./popup.css" rel="stylesheet"/>
+    <link href="./position.css" rel="stylesheet"/>
     <link href="./styles.css" rel="stylesheet"/>
+    <link href="./tile.css" rel="stylesheet"/>
 </head>
 <body>
 <div id="game" class="center">
@@ -14,9 +17,17 @@
         </div>
         <button id="new-game">New Game</button>
         <div id="seed-container">
-            <label for="seed"></label>
+            <label for="seed" style="display: none"></label>
             <input id="seed" placeholder="Seed" maxlength="20"/>
             <p id="current-seed"></p>
+            <div id="seed-buttons">
+                <button id="load-seed">Load</button>
+                <button id="copy-seed" class="popup">
+                    Copy
+                    <span class="popup-text" id="copy-popup">Copied!</span>
+                </button>
+                <button id="clear-seed">Clear</button>
+            </div>
         </div>
     </div>
     <div class="game-container">

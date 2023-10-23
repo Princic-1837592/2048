@@ -1,4 +1,4 @@
-import init, {push, new_game} from "./pkg/wasm_frontend.js";
+import init, {new_game, push} from "./pkg/wasm_frontend.js";
 
 init().then(initialize_grid);
 
@@ -114,7 +114,30 @@ function only_numbers() {
     this.value = this.value.replace(/[^0-9]/g, '');
 }
 
+function load_seed() {
+    const seed = document.getElementById("seed");
+    seed.value = document.getElementById("current-seed").textContent;
+    initialize_grid();
+}
+
+function copy_seed() {
+    const seed = document.getElementById("current-seed").textContent;
+    navigator.clipboard.writeText(seed).then(_ => {
+        const popup = document.getElementById("copy-popup");
+        popup.classList.toggle("show");
+        popup.onanimationend = () => popup.classList.toggle("show");
+    });
+}
+
+function clear_seed() {
+    document.getElementById("seed").value = "";
+}
+
+
 document.addEventListener('keydown', keydown_event);
 document.getElementById("new-game").onclick = initialize_grid;
 document.getElementById("seed").oninput = only_numbers;
+document.getElementById("load-seed").onclick = load_seed;
+document.getElementById("copy-seed").onclick = copy_seed;
+document.getElementById("clear-seed").onclick = clear_seed;
 
