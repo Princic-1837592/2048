@@ -33,6 +33,7 @@ function initialize_grid() {
         }
     }
     document.getElementById("current-seed").textContent = `${seed}`;
+    document.getElementById("score").textContent = "0";
 }
 
 class ToMove {
