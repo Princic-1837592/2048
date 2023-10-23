@@ -20,13 +20,13 @@ html, body {
 .score-container {
     display: inline-block;
     background: #bbada0;
-    font-size: 25px;
     font-weight: bold;
     border-radius: 3px;
     color: white;
     text-align: center;
     vertical-align: top;
     height: 50px;
+    width: 110px;
 }
 
 .score-container .score-title {
@@ -38,6 +38,7 @@ html, body {
 }
 
 .score-container #score {
+    font-size: 20px;
     margin-left: 10px;
     margin-right: 10px;
     margin-bottom: 5px;
@@ -58,7 +59,7 @@ button {
     vertical-align: top;
     display: inline-block;
     height: 50px;
-    padding: 0 20px;
+    padding: 0 7px;
     font-size: 20px;
     margin-left: 10px;
 }
@@ -74,10 +75,10 @@ button {
     display: block;
     resize: none;
     height: 24px;
-    width: 240px;
+    width: 230px;
     border: none;
     border-radius: 3px;
-    padding: 13px 0 13px 20px;
+    padding: 13px 0 13px 10px;
     font-size: 19px;
     background: #bbada0;
     color: white;
@@ -89,7 +90,7 @@ button {
     margin-top: 26px;
     display: inline-block;
     font-family: monospace;
-    width: 200px;
+    width: 170px;
     vertical-align: top;
 }
 
@@ -101,6 +102,7 @@ button {
 #seed-buttons > * {
     display: block;
     margin-top: 5px;
+    width: 55px;
 }
 
 .game-container {
